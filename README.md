@@ -18,7 +18,7 @@ Welcome to Vitae Canvas, a pioneering project dedicated to the simulation and ex
 
 **Features**
 
-The project is in its early stages and there is no available information to provide at this time.
+- The project is in its early stages and there is no available information to provide at this time.
 
 **Contribution**
 
