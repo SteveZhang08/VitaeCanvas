@@ -14,11 +14,11 @@ Vitae Canvas - 生命绘卷 ，创造模拟低级生命体的行为并探索进�
 
 **Overview**
 
-Welcome to Vitae Canvas, a pioneering project dedicated to the simulation and exploration of life's fundamental behaviors and evolutionary processes through computational models. Our mission is to create a virtual ecosystem where life can emerge, adapt, and evolve autonomously, mirroring the complexity and dynamism of natural life.
+Welcome to Vitae Canvas, we intend to create simulations of the behavior of lower life forms and explore the evolutionary path.
 
 **Features**
 
-The project is in its early stages and there is no available information to provide at this time.
+- The project is in its early stages and there is no available information to provide at this time.
 
 **Contribution**
 
@@ -32,7 +32,7 @@ We welcome contributions from developers and scientists passionate about evoluti
 
 **概览**
 
-欢迎来到Vitae Canvas，这是一个开创性的项目，专注于通过计算模型来模拟和探索生命的基本行为和进化过程。我们的使命是创建一个虚拟生态系统，在这里，生命可以自主地诞生、适应和进化，模仿自然生命体的复杂性和动态性。
+欢迎来到Vitae Canvas，我们打算创造模拟低级生命体的行为，并探索进化路程。
 
 **特性**
 
