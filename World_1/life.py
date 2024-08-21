@@ -3,6 +3,7 @@ import os
 import json
 
 global life_path
+global alive
 
 life_path = os.path.abspath(__file__)
 floder_path = os.path.dirname(life_path)
@@ -17,7 +18,7 @@ class life:
         '''生命初始化'''
         try:
             loaded_DNA = get.read(name)       #读取DNA数据
-        except FileNotFoundError:   #如果没有找到基因文件,则创建初始DNA
+        except:   #如果没有找到基因文件,则创建初始DNA
             life_DNA = {
             "iterations": 1,
             "name": name,
@@ -63,10 +64,15 @@ class get:
     def read(name):
         '''读取DNA数据'''
         try:
-            with open(os.path.join(floder_path, name + ".gene"), 'r') as file:  #尝试寻找基因文件
-                loaded_DNA = str(json.load(file))   #读取基因文件内容并存储在DNA中
+            while True:
+                with open(os.path.join(floder_path, name + ".gene"), 'r') as file:  #尝试寻找基因文件
+                    try:
+                        loaded_DNA = str(json.load(file))   #读取基因文件内容并存储在DNA中
+                        break
+                    except:
+                        pass
             return loaded_DNA
-        except:
+        except FileExistsError:
             return False
 
     def DNA(loaded_DNA):
