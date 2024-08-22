@@ -1,6 +1,7 @@
 import shutil
 import os
 import json
+import sys
 
 global life_path
 global alive
@@ -10,9 +11,16 @@ life_floder_path = os.path.dirname(life_path)
 alive = True
 
 class life:
-    def breed(me,iterations):
+    def breed(name,iterations):
         '''生命繁殖'''
-        shutil.copy(os.path.join(life_floder_path,me),os.path.join(life_floder_path,me+str(iterations)))
+        name1 = name + ".py"
+        iterations = int(iterations) + 1
+        name2 = name+str(iterations)
+        shutil.copy(os.path.join(life_floder_path,name1),os.path.join(life_floder_path,name2+".py"))
+        itDna = life.load(name)
+        itDna["name"] = name + str(iterations)
+        itDna["iterations"] = str(iterations)
+        life.save(name2,itDna)
 
     def init(name):
         '''生命初始化'''
@@ -46,10 +54,10 @@ class life:
         except FileExistsError:
             return False
 
-    def save(life_DNA):
-        '''存储DNA信息，需提供参数：DNA'''
+    def save(name,life_DNA):
+        '''存储DNA信息，需提供参数：生命名字（文件名）, DNA'''
         json_str = json.dumps(life_DNA, indent=4)    #将DNA文件存储为json并写入基因文件
-        with open(os.path.join(life_floder_path, "vita.gene"), 'w') as file:
+        with open(os.path.join(life_floder_path, name + ".gene"), 'w') as file:
             file.write(json_str)
 
     def load(name):
@@ -91,3 +99,6 @@ class get:
             print("event 文件不存在!")
             return FileExistsError
 
+    def Error():
+        '''报错退出法，无需提供参数'''
+        return 1 + "1"

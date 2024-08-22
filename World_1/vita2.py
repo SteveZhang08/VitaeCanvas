@@ -34,7 +34,7 @@ def action():                   #定义生命的活动
             print(f"生命 {name} 进食，当前能量值:", DNA["food"])
         elif Alive(True):       #此处用来代替原来的if else中的else,该情况即life.eat()的返回值为False
             DNA["food"] = DNA["food"] - 1   #生命未进食,因寻找食物消耗能量
-            #print(f"生命 {name} 没找到食物，当前能量值:", DNA["food"])
+            print(f"生命 {name} 没找到食物，当前能量值:", DNA["food"])
 
         if Alive(DNA["food"] >= 200):
             DNA["food"] = int(DNA["food"] / 2)
