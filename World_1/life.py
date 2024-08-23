@@ -30,7 +30,8 @@ class life:
             life_DNA = {
             "iterations": 1,
             "name": name,
-            "food":10
+            "food": 10,
+            "midTemperature": 25
             }
             json_str = json.dumps(life_DNA, indent=4)    #将DNA文件存储为json并写入基因文件
             with open(os.path.join(life_floder_path, "vita.gene"), 'w') as file:
@@ -104,6 +105,7 @@ class get:
             life_DNA[i.split(":")[0].replace("'","")] = i.split(":")[1].replace("'","")     #将基因文件写入DNA
         life_DNA["iterations"] = int(life_DNA["iterations"])      #修正迭代数据,从字符串修正为整数类型
         life_DNA["food"] = int(life_DNA["food"])                  #修正能量数据,从字符串修正为整数类型
+        life_DNA["midTemperature"] = int(life_DNA["midTemperature"])
         return life_DNA 
     
     def event():

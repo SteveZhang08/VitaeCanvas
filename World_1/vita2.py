@@ -14,6 +14,9 @@ print(f"生命 {name} 已经启动。")
 DNA = life.init(name)           #初始化,并获取DNA信息
 print(f"DNA数据:\n{DNA}")
 
+def DT():
+    return get.Temperature() - DNA["midTemperature"]
+
 def Alive(whether):             #先判断生命是否存活
     return (whether and temp != "dead")
 
@@ -34,7 +37,7 @@ def action():                   #定义生命的活动
             print(f"生命 {name} 进食，当前能量值:", DNA["food"])
         elif Alive(True):       #此处用来代替原来的if else中的else,该情况即life.eat()的返回值为False
             DNA["food"] = DNA["food"] - 1   #生命未进食,因寻找食物消耗能量
-            print(f"生命 {name} 没找到食物，当前能量值:", DNA["food"])
+            #print(f"生命 {name} 没找到食物，当前能量值:", DNA["food"])
 
         if Alive(DNA["food"] >= 200):
             DNA["food"] = int(DNA["food"] / 2)
@@ -42,6 +45,19 @@ def action():                   #定义生命的活动
             life.breed(name,DNA["iterations"])
             print(f"生命 {name} 完成了一次分裂繁殖")
 
+        if abs(DT()) >= 10 and abs(DT()) < 15:
+            DNA["food"] = DNA["food"] - 1
+            print("温度小变化，能量值-1")
+        elif abs(DT()) >= 15 and abs(DT()) < 20:
+            DNA["food"] = DNA["food"] - 2
+            print("温度稍变化,能量值-2")
+        elif abs(DT()) >= 20 and abs(DT()) < 25:
+            DNA["food"] = DNA["food"] - 3
+            print("温度变化过大，能量值-3")
+        else:
+            DNA["food"] = DNA["food"] - (abs(DT()) - 25) - 3
+            print(f"温度不适宜当前生命生存!,能量值-{abs(DT()) - 22}")
+        
         if Alive(True):         #此处是单纯判断生命是否活着,如果生命已经死了,就不会存储DNA信息
             life.save(name,DNA)      #如果生命活着,则存储DNA信息
     

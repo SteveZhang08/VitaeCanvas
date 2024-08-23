@@ -1,5 +1,6 @@
 {
-    "iterations": 2,
+    "iterations": "2",
     "name": "vita2",
-    "food": 0
+    "food": 105,
+    "midTemperature": 25
 }
