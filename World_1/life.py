@@ -79,6 +79,23 @@ class get:
         except FileExistsError:
             return False
 
+    def any_read(name):
+        '''读取任意数据'''
+        try:
+            with open(os.path.join(life_floder_path, name), 'r') as file:  #尝试寻找文件
+                loaded = str(json.load(file))   #读取文件内容并存储在字典中
+            return loaded
+        except FileExistsError:
+            return False
+    
+    def dict(loaded):
+        '''解析字典文件'''
+        loaded_Dict = {}
+        list = loaded.replace("{","").replace("}","").replace(" ","").split(",")
+        for i in list:
+            loaded_Dict[i.split(":")[0].replace("'","")] = i.split(":")[1].replace("'","")
+        return loaded_Dict
+
     def DNA(loaded_DNA):
         '''解码DNA数据'''
         life_DNA = {}
@@ -102,3 +119,14 @@ class get:
     def Error():
         '''报错退出法，无需提供参数'''
         return 1 + "1"
+
+    def Temperature():
+        environment = get.dict(get.any_read("environment"))
+        environment["temperature"] = int(environment["temperature"])
+        return environment["temperature"]
+
+    def any_save(name,dict):
+        '''存储信息，需提供参数：完整文件名, 字典'''
+        json_str = json.dumps(dict, indent=4)    #将字典存储为json并写入文件
+        with open(os.path.join(life_floder_path, name), 'w') as file:
+            file.write(json_str)
