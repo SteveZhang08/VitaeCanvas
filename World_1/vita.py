@@ -44,7 +44,8 @@ def action():                   #定义生命的活动
             life.save(name,DNA)
             life.breed(name,DNA["iterations"])
             print(f"生命 {name} 完成了一次分裂繁殖")
-
+            DNA = life.load(name)
+            
         if abs(DT()) >= 10 and abs(DT()) < 15:
             DNA["food"] = DNA["food"] - 1
             print("温度小变化，能量值-1")

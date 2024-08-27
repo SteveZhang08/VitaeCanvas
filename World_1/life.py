@@ -13,14 +13,18 @@ alive = True
 class life:
     def breed(name,iterations):
         '''生命繁殖'''
-        name1 = name + ".py"
-        iterations = int(iterations) + 1
-        name2 = name+str(iterations)
-        shutil.copy(os.path.join(life_floder_path,name1),os.path.join(life_floder_path,name2+".py"))
-        itDna = life.load(name)
-        itDna["name"] = name + str(iterations)
-        itDna["iterations"] = str(iterations)
-        life.save(name2,itDna)
+        name1 = name + ".py"              #修正名字信息
+        iterations = int(iterations) + 1  #迭代次数更新
+        name2 = name + "-" + str(iterations)    #下一代生命的名字
+        shutil.copy(os.path.join(life_floder_path,name1),os.path.join(life_floder_path,name2+".py"))    #复制生命逻辑体
+        itDna = life.load(name)           #加载原生命基因文件
+        itDna["name"] = name2             #更新生命名称
+        life.save(name2,itDna)                #创建新生命的基因文件
+        #新生命复制完成
+        itDna["name"] = name                  #修正回原生命信息
+        itDna["iterations"] = str(iterations) #更新原生命迭代次数
+        life.save(name,itDna)                 #写入原生命基因文件
+
 
     def init(name):
         '''生命初始化'''
