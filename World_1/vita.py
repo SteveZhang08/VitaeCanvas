@@ -1,4 +1,4 @@
-from life import *              #导入生命基本活动的库
+from package.life import *              #导入生命基本活动的库
 import threading                #此库用来实现多线程
 
 global name                     #一些需要全局变量的地方

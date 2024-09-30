@@ -47,11 +47,11 @@ class life:
     def eat():
         '''进食'''
         try:
-            with open(os.path.join(life_floder_path, "food"), 'r') as file:
+            with open(os.path.join(life_floder_path, "./argument/food"), 'r') as file:
                 food_num = int(file.read().replace(" ","").replace("\n",""))
             if food_num > 0:
                 food_num = food_num - 1
-                with open(os.path.join(life_floder_path, "food"), 'w') as file:
+                with open(os.path.join(life_floder_path, "./argument/food"), 'w') as file:
                     file.write(str(food_num))
                 return True
             else:
@@ -85,10 +85,10 @@ class get:
             return False
 
     def any_read(name):
-        '''读取任意数据'''
+        '''读取任意json数据'''
         try:
             with open(os.path.join(life_floder_path, name), 'r') as file:  #尝试寻找文件
-                loaded = str(json.load(file))   #读取文件内容并存储在字典中
+                loaded = str(json.load(file))   #读取文件内容并存储
             return loaded
         except FileExistsError:
             return False
@@ -115,7 +115,7 @@ class get:
     def event():
         '''获取事件信息'''
         try:
-            with open(os.path.join(life_floder_path, "event"), 'r') as file:
+            with open(os.path.join(life_floder_path, "./argument/event"), 'r') as file:
                 re = file.read()
             return re.replace("\n","")
         except FileExistsError:
@@ -127,7 +127,7 @@ class get:
         return 1 + "1"
 
     def Temperature():
-        environment = get.dict(get.any_read("environment"))
+        environment = get.dict(get.any_read("./argument/environment"))
         environment["temperature"] = int(environment["temperature"])
         return environment["temperature"]
 

@@ -1,13 +1,13 @@
-from life import *
+from package.life import *
 
 def execution(name):
-    with open(os.path.join(life_floder_path, "event"), 'w') as file:
+    with open(os.path.join(life_floder_path, "./argument/event"), 'w') as file:
         write = "execution " + name
         file.write(write)
 def temperature(temperature):
     environment = {}
     environment["temperature"] = int(temperature)
-    get.any_save("environment",environment)
+    get.any_save("./argument/environment",environment)
 
 while True:
     i = input("$ >")
@@ -15,7 +15,7 @@ while True:
         name = i.split(" ")[1]
         execution(name)
         print("[file:event] Finished.")
-        #with open(os.path.join(life_floder_path, "event"), 'w') as file:
+        #with open(os.path.join(life_floder_path, "./argument/event"), 'w') as file:
         #    pass
 
     elif i.startswith("set"):
