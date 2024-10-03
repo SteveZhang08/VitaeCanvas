@@ -27,3 +27,6 @@ class base():
         co2 = co2 + num
         TempDict["co2"] = co2
         get.any_save("./argument/environment", TempDict)
+
+    def move(x: int, y: int):
+        '''move  移动'''G
