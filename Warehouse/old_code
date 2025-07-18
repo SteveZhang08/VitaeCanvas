@@ -1,0 +1,148 @@
+原先的扩散算法  2025/4/19
+    def energy_diffusion(self):
+        """扩散环境网格中能量"""
+        def add_energy(x, y, value):
+            z = self.check_type_on_env(self.read(x, y), Energy) # 寻找该位置中 Energy 的索引
+            if z != -1 :    # 如果 Energy 存在于该位置
+                self.write(x, y, Energy(self.read(x, y)[z].value + value))
+            else:
+                self.write(x, y, Energy(value))
+        def normal_diffusion(x, y, value):
+            """不在边界时扩散"""
+            add_energy(x + 1, y, value)  # 向右扩散
+            add_energy(x - 1, y, value)  # 向左扩散
+            add_energy(x, y + 1, value)  # 向下扩散
+            add_energy(x, y - 1, value)  # 向上扩散
+            add_energy(x, y, 0 - value)  # 扩散后当前网格减少能量
+        where_energy = self.find_type(Energy)
+        for location in where_energy:
+            x = location[0]
+            y = location[1]
+            z = location[2]
+            energy = self.read(x, y)[location[2]]
+            debug(f"Energy 数据读取正常 {energy}")
+            diffusion_value = energy.value * DIFFUSION_RATE # 单个网格扩散量
+            debug(f"单个网格扩散量：{diffusion_value}")
+            # 检查能量值是否大于 0
+            if energy.value > 0 :
+                # 检查能量是否环境边界
+                if x == 0:    # 在左边界
+                    if y == 0:    # 在左上角
+                        debug(f"扩散起点在左上角")
+                        total_diffusion_value = diffusion_value * 3     # 总扩散量（需要扩散两个方向，以及当前网格仍然需要保留能量，所以乘 3）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            debug(f"即将按照扩散系数扩散")
+                            add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                            debug("向右扩散完成！")
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            debug("向下扩散完成！")
+                            add_energy(x, y ,0 - diffusion_value * 2)  # 扩散后当前网格减少能量
+                            debug(f"当前环境数据信息：{self.env}")
+                        else:
+                            diffusion_value = energy.value / 3 # 实际的单个网格扩散量
+                            add_energy(x + 1, y, diffusion_value)
+                            add_energy(x, y + 1, diffusion_value)
+                            add_energy(x, y, 0 - diffusion_value * 2)
+                    elif y == self.height - 1:  # 在左下角
+                        total_diffusion_value = diffusion_value * 3     # 总扩散量（需要扩散两个方向，以及当前网格仍然需要保留能量，所以乘 3）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 2)  # 扩散后当前网格减少能量
+                        else:
+                            diffusion_value = energy.value / 3 # 实际的单个网格扩散量
+                            add_energy(x + 1, y, diffusion_value)
+                            add_energy(x, y - 1, diffusion_value)
+                            add_energy(x, y, 0 - diffusion_value * 2)
+                    else:
+                        total_diffusion_value = diffusion_value * 4     # 总扩散量（需要扩散三个方向，以及当前网格仍然需要保留能量，所以乘 4）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                        else:
+                            diffusion_value = energy.value / 4      # 实际的单个网格扩散量
+                            add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                elif x == self.width - 1: # 在右边界
+                    if y == 0:    # 在右上角
+                        total_diffusion_value = diffusion_value * 3     # 总扩散量（需要扩散两个方向，以及当前网格仍然需要保留能量，所以乘 3）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            add_energy(x, y, 0 - diffusion_value * 2)  # 扩散后当前网格减少能量
+                        else:
+                            diffusion_value = energy.value / 3 # 实际的单个网格扩散量
+                            add_energy(x + 1, y, diffusion_value)
+                            add_energy(x, y + 1, diffusion_value)
+                            add_energy(x, y, 0 - diffusion_value * 2)
+                    elif y == self.height - 1:  # 在右下角
+                        total_diffusion_value = diffusion_value * 3     # 总扩散量（需要扩散两个方向，以及当前网格仍然需要保留能量，所以乘 3）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 2)  # 扩散后当前网格减少能量
+                        else:
+                            diffusion_value = energy.value / 3 # 实际的单个网格扩散量
+                            add_energy(x + 1, y, diffusion_value)
+                            add_energy(x, y - 1, diffusion_value)
+                            add_energy(x, y, 0 - diffusion_value * 2)
+                    else:
+                        total_diffusion_value = diffusion_value * 4     # 总扩散量（需要扩散三个方向，以及当前网格仍然需要保留能量，所以乘 4）
+                        if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                            # 按照扩散系数扩散
+                            add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                        else:
+                            diffusion_value = energy.value / 4 # 实际的单个网格扩散量
+                            add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                            add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                            add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                            add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+
+                elif y == 0:    # 在上边界
+                    total_diffusion_value = diffusion_value * 4     # 总扩散量（需要扩散三个方向，以及当前网格仍然需要保留能量，所以乘 4）
+                    if total_diffusion_value < energy.value:        # 如果总扩散量小于当前的能量
+                        # 按照扩散系数扩散
+                        add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                        add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                        add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                        add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                    else:
+                        diffusion_value = energy.value / 4 # 实际的单个网格扩散量
+                        add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                        add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                        add_energy(x, y + 1, diffusion_value)   # 向下扩散
+                        add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                    
+                elif y == self.height - 1:  # 在下边界
+                    total_diffusion_value = diffusion_value * 4     # 总扩散量（需要扩散三个方向，以及当前网格仍然需要保留能量，所以乘 4）
+                    if total_diffusion_value < energy.value:        # 如果总扩散量小于当前的能量
+                        # 按照扩散系数扩散
+                        add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                        add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                        add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                        add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                    else:
+                        diffusion_value = energy.value / 4 # 实际的单个网格扩散量
+                        add_energy(x - 1, y, diffusion_value)   # 向左扩散
+                        add_energy(x + 1, y, diffusion_value)   # 向右扩散
+                        add_energy(x, y - 1, diffusion_value)   # 向上扩散
+                        add_energy(x, y, 0 - diffusion_value * 3)  # 扩散后当前网格减少能量
+                else:
+                    total_diffusion_value = diffusion_value * 5     # 总扩散量（需要扩散四个方向，以及当前网格仍然需要保留能量，所以乘 5）
+                    if total_diffusion_value < energy.value:    # 如果总扩散量小于当前的能量
+                        normal_diffusion(x, y, diffusion_value) # 向四方扩散
+                    else:
+                        diffusion_value = energy.value / 5 # 实际的单个网格扩散量
+                        normal_diffusion(x, y, diffusion_value) # 向四方扩散
