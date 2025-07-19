@@ -5,7 +5,6 @@
 # These AI_Models that provide help for the file:
 # Kimi    DeepSeek-R1
 
-import random
 import re
 from . import random_DNA
 from . import env
@@ -22,7 +21,7 @@ class CellError(Exception):
 class DNA:
     """DNA对象，包含碱基 ATCG"""
 
-    def __init__(self, sequence):
+    def __init__(self, sequence:str):
         """初始化 DNA 对象，键入碱基"""
         # 移除非法字符
         self.sequence = self._validate_sequence(sequence)
@@ -96,7 +95,7 @@ class RNA:
         """返回 RNA 序列的长度"""
         return len(self.sequence)
 
-    def _split(self, sequence):
+    def _split(self, sequence) -> str:
         """返回拆分后的 RNA"""
         rna = ""
         for i in range(0, len(sequence), 3):
@@ -105,7 +104,7 @@ class RNA:
         return rna[:-1]
 
 class Protein:
-    """蛋白质（事实上只是多肽）"""
+    """蛋白质"""
     def __init__(self, sequence:str):
         """初始化蛋白质对象，确保序列只包含合法氨基酸"""
         #if not sequence.startswith("M"):
@@ -122,7 +121,7 @@ class Protein:
         # 移除非法字符并转换为大写
         cleaned_sequence = ''.join([aa.upper() for aa in sequence if aa.upper() in valid_amino_acids])
         if cleaned_sequence != sequence.upper():
-            print(f"警告：输入序列包含非法氨基酸，已移除非法字符。原始序列：{sequence}")
+            env.warning(f"警告：输入序列包含非法氨基酸，已移除非法字符。原始序列：{sequence}")
         return cleaned_sequence
 
     def __str__(self):
