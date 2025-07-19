@@ -23,7 +23,7 @@ class MetabolismSystem:
         if energy_index != None:
             self.energy:Energy = grid_data[energy_index]
         else:
-            print("Energy对象未找到")
+            debug("Energy对象未找到，自动初始化为0")
             self.energy = Energy(0)
             env.write(self.x, self.y, self.energy)
         self.env = env

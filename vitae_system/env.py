@@ -5,7 +5,7 @@
 # These AI_Models that provide help for the file:
 # Kimi  DeepSeek-R1
 DIFFUSION_RATE = 0.1
-DEBUG = True
+DEBUG = False
 WARNING = False
 
 def debug(message):

@@ -165,7 +165,7 @@ class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 
     MAX_GENE_LENGTH = 300 #DNA的最大有效长度
-    MAX_METABOLIC = 1.2  #最大能量转化率
+    MAX_METABOLIC = 0.8  #最大能量转化率
     MIN_METABOLIC = 0.1  #最小能量转化率
 
     def __init__(self, env1:env.Environment,x:int, y:int, dna:DNA = DNA("ATCG"), name = None) -> None:
@@ -200,7 +200,7 @@ class Cell:
         return DNA(effective_dna.upper())
 
     def DNA_translate(self, dna:DNA) -> RNA:
-        """翻译 DNA 为 RNA"""
+        """转录 DNA 为 RNA"""
         translation_table = str.maketrans({
             "A": "U", 
             "T": "A", 
