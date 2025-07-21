@@ -3,6 +3,13 @@ from . import env
 from . import metabolism
 from time import time
 
+# 设置模块搜索路径
+import os
+import sys
+
+# 添加项目根目录到系统路径，以便测试导入
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 __version__ = "0.1.0"
 __author__ = "SteveZhang08"
 __all__ = ['cells', 'env', 'metabolism']
