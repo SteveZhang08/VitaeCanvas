@@ -1,5 +1,5 @@
 # === VitaeCanvas ===
-# ./system/cells.py
+# ./vitae_system/cells.py
 # by SteveZhang08
 # Helpers: None
 # These AI_Models that provide help for the file:
@@ -149,7 +149,12 @@ class Protein:
         return len(self.sequence)
 
     def _metabolic(self, sequence):
-        """计算能量转化率"""
+        """
+        代谢率 = (加成氨基酸数 - 抑制氨基酸数) / 总氨基酸数
+        加成氨基酸：L,I,V,Q,A,R,S,D
+        抑制氨基酸：W,G,H,P,M
+        """
+
         a = 0
         add = ["L","I","V","Q","A","R","S","D"]
         sub = ["W","G","H","P","M"]

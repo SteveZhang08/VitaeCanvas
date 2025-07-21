@@ -1,3 +1,10 @@
+# === VitaeCanvas ===
+# ./vitae_system/random_DNA.py
+# by SteveZhang08
+# Helpers: None
+# These AI_Models that provide help for the file:
+# Kimi
+
 import random
 
 def generate_dna(length=30):

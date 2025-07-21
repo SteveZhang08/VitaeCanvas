@@ -1,3 +1,8 @@
+# === VitaeCanvas ===
+# ./vitae_system/metabolism.py
+# by SteveZhang08
+# Helpers: None
+
 from .cells import*
 from .env import*
 import time
