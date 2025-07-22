@@ -164,7 +164,35 @@ class Protein:
             a -= sequence.count(i)
         metabolic = max(min(a/len(sequence), Cell.MAX_METABOLIC),Cell.MIN_METABOLIC)    #保证能量转化率在规定范围内
         return metabolic
-        
+
+class NADH(env.Energy):
+    def __init__(self, value: float = 1.0) -> None:
+        super().__init__(value, diffuse=False)
+        self.value = value
+
+class Sugar:
+    def __init__(self, C:int=6, H:int=12, O:int=6) -> None:
+        """
+        糖的分子式
+        :param C: 糖的碳原子数量，小于1的值会被重置为1
+        :param H: 糖的氢原子数量，小于1的值会被重置为1
+        :param O: 糖的氧原子数量，小于1的值会被重置为1
+        """
+        self.C = max(C,1)
+        self.H = max(H,1)
+        self.O = max(O,1)
+
+    def Hydrolysis(self) -> list:
+        """
+        糖的水解
+        :param metabolic: 能量转化率
+        return: 糖的水解产物构成的列表
+        """
+        energy_value = (self.C - self.O)/3 + 2
+        NADH_value = (self.H - self.C)/3
+        return [env.Energy(energy_value), NADH(NADH_value)]
+
+
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 
