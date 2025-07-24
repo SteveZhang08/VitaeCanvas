@@ -80,9 +80,10 @@ Due to developer's academic constraints, code contributions are not accepted yet
 
 > ⚠⚠⚠️ Warning: Project architecture may undergo breaking changes. Recommended to Fork for secondary development.  
 ### **List of Developers (in no particular order)**
-- **Developer**: SteveZhang08, HLF1633
-- **AI Model**：Kimi, DeepSeek-R1
+​​- **Code Development**​​: SteveZhang08, HLF1633
+- **​​Biological System Construction**​​: zyying
 - **​​Academic Support**​​: High school biology teacher of SteveZhang08
+- **AI Model**：Kimi, DeepSeek-R1
 
 
 **VitaeCanvas - 生命绘卷**
@@ -163,7 +164,9 @@ Vitae_System/
 
 > ⚠️ 注意：项目架构可能发生破坏性变更，建议Fork分支进行二次开发  
 ### **开发人员名单 (排名不分先后)**  
-- **开发者**: SteveZhang08, HLF1633
-- **AI Model**：Kimi, DeepSeek-R1
-- **学术支持**：SteveZhang08 的初高中生物教师  
+- **代码编写**: SteveZhang08, HLF1633
+- **生物体系构建**: zyying
+- **学术支持**: SteveZhang08 的初高中生物教师 
+- **AI Model**: Kimi, DeepSeek-R1
+ 
 
