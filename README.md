@@ -79,9 +79,10 @@ Due to developer's academic constraints, code contributions are not accepted yet
 3. Educational applications: Demo cases for high school/university biology courses
 
 > ⚠⚠⚠️ Warning: Project architecture may undergo breaking changes. Recommended to Fork for secondary development.  
-### **Special Thanks**  
-- **AI Collaboration**: Core algorithm suggestions from Kimi & DeepSeek-R1  
-- **Academic Advisor**: SteveZhang08's high school biology teacher
+### **List of Developers (in no particular order)**
+- **Developer**: SteveZhang08, HLF1633
+- **AI Model**：Kimi, DeepSeek-R1
+- **​​Academic Support**​​: High school biology teacher of SteveZhang08
 
 
 **VitaeCanvas - 生命绘卷**
@@ -161,7 +162,8 @@ Vitae_System/
 3. 教学应用：高中/大学生物课演示案例
 
 > ⚠️ 注意：项目架构可能发生破坏性变更，建议Fork分支进行二次开发  
-### **特别致谢**  
-- **AI协作**：Kimi & DeepSeek-R1 提供核心算法建议  
-- **学术顾问**：SteveZhang08 的高中生物教师  
+### **开发人员名单 (排名不分先后)**  
+- **开发者**: SteveZhang08, HLF1633
+- **AI Model**：Kimi, DeepSeek-R1
+- **学术支持**：SteveZhang08 的初高中生物教师  
 
