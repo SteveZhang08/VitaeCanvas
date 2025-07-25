@@ -10,11 +10,11 @@ import sys
 # 添加项目根目录到系统路径，以便测试导入
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-__version__ = "0.1.0"
-__author__ = "SteveZhang08"
+__version__ = "0.1.1"
+__author__ = "SteveZhang08, HLF1633"
 __all__ = ['cells', 'env', 'metabolism']
-__date__ = "2025-7-16"
-time_stamp = 1752676067
+__date__ = "2025-7-25"
+time_stamp = 1753415946
 
 print('Welcome to use Vitae_System, thank you for your use.')
 print(f'Developer: {__author__}')

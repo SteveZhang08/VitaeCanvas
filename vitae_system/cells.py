@@ -165,6 +165,19 @@ class Protein:
         metabolic = max(min(a/len(sequence), Cell.MAX_METABOLIC),Cell.MIN_METABOLIC)    #保证能量转化率在规定范围内
         return metabolic
 
+    def function(self):
+        """
+        蛋白质功能
+        """
+        sequence = self.sequence
+        result = []
+        while True:
+            if sequence.startswith("HYCEKM") or sequence.startswith("HYCDKM"):
+                result.append()
+            elif sequence.startswith():
+                pass
+        pass
+
 class NADH(env.Energy):
     def __init__(self, value: float = 1.0) -> None:
         super().__init__(value, diffuse=False)
@@ -185,13 +198,13 @@ class Sugar:
     def Hydrolysis(self) -> list:
         """
         糖的水解
-        :param metabolic: 能量转化率
         return: 糖的水解产物构成的列表
         """
+        # 能量值计算：(碳原子数 - 氧原子数)/3 + 2
         energy_value = (self.C - self.O)/3 + 2
+        # NADH值计算：(氢原子数 - 碳原子数)/3
         NADH_value = (self.H - self.C)/3
         return [env.Energy(energy_value), NADH(NADH_value)]
-
 
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
