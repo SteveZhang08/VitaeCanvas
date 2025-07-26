@@ -7,8 +7,6 @@
 
 > 🌱🌱 *"The meaning of life lies not only in existence, but in understanding existence itself"*
 
-
-
 **VitaeCanvas - Life Canvas**
 
 ## Project Introduction
@@ -79,18 +77,21 @@ Due to developer's academic constraints, code contributions are not accepted yet
 3. Educational applications: Demo cases for high school/university biology courses
 
 > ⚠⚠⚠️ Warning: Project architecture may undergo breaking changes. Recommended to Fork for secondary development.  
-### **List of Developers (in no particular order)**
-​​- **Code Development**​​: SteveZhang08, HLF1633
+### **List of Developers (in no particular order)**  
+- **Code Development**​​: SteveZhang08, HLF1633
 - **​​Biological System Construction**​​: zyying
 - **​​Academic Support**​​: High school biology teacher of SteveZhang08
-- **AI Model**：Kimi, DeepSeek-R1
+- **AI model assistance**：Kimi, DeepSeek-R1
 
 
-**VitaeCanvas - 生命绘卷**
 
+# VitaeCanvas
 > VitaeCanvas - 生命绘卷 ，创造模拟生命体的细胞级演化框架  
 
 > 🌱 *"生命的意义不仅在于存在，更在于理解存在本身"*
+
+**VitaeCanvas - 生命绘卷**
+
 ## 项目简介
 **VitaeCanvas（生命绘卷）** 是一个由一位中国高中生（SteveZhang08）发起的开源项目，旨在通过计算机模拟低级生命体（如单个细胞）的行为，并探索其进化路径。项目使用Python编写，目前处于早期开发阶段。
 
@@ -167,6 +168,6 @@ Vitae_System/
 - **代码编写**: SteveZhang08, HLF1633
 - **生物体系构建**: zyying
 - **学术支持**: SteveZhang08 的初高中生物教师 
-- **AI Model**: Kimi, DeepSeek-R1
+- **AI 模型辅助**: Kimi, DeepSeek-R1
  
 
