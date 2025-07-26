@@ -3,9 +3,15 @@
 # by SteveZhang08
 # Helpers: None
 
-from .cells import*
-from .env import*
-import time
+if __name__ == "__main__":
+    # 当作为主程序直接运行时，绝对导入同级模块
+    from cells import*
+    from .env import*
+    import time
+else:
+    # 当作为模块被导入时，相对导入库内同级模块
+    from .cells import*
+    from .env import*
 
 class MetabolismSystem:
     """代谢系统控制器，处理能量转换与物质交换"""
@@ -19,6 +25,7 @@ class MetabolismSystem:
         :side effect: 
             - 修改cell.energy值
             - 修改Cell所在坐标的Energy的值
+            - 将cell.age增加 1
         """
         self.x = cell.x
         self.y = cell.y
@@ -34,6 +41,7 @@ class MetabolismSystem:
         self.env = env
         self.cell:Cell = grid_data[env.check_type_on_env(grid_data, Cell)]
         self.cell.energy += self.metabolic_energy(self.absorb_energy())
+        self.cell.age += 1
         env.write(self.x, self.y, self.cell)
 
     def absorb_energy(self) -> Energy:

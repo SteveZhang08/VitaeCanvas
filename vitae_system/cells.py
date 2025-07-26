@@ -6,8 +6,16 @@
 # Kimi    DeepSeek-R1
 
 import re
-from . import random_DNA
-from . import env
+from typing import List
+
+if __name__ == "__main__":
+    # 当作为主程序直接运行时，绝对导入同级模块
+    import random_DNA
+    import env
+else:
+    # 当作为模块被导入时，相对导入库内同级模块
+    from . import random_DNA
+    from . import env
 
 class CellError(Exception):
     """细胞活动异常"""
@@ -107,12 +115,11 @@ class Protein:
     """蛋白质"""
     def __init__(self, sequence:str):
         """初始化蛋白质对象，确保序列只包含合法氨基酸"""
-        #if not sequence.startswith("M"):
-        #    raise CellError('Protein error: should start with "M"' + "\n蛋白质错误:开头应为“M”")
         if sequence == "":
             raise CellError('Protein error: The protein is "None"' + "\n蛋白质错误:蛋白质为空")
         self.sequence = self._validate_sequence(sequence)
         self.metabolic = self._metabolic(self.sequence)
+        self.function_list = self.function()
 
     def _validate_sequence(self, sequence):
         """验证序列是否只包含合法氨基酸"""
@@ -165,18 +172,33 @@ class Protein:
         metabolic = max(min(a/len(sequence), Cell.MAX_METABOLIC),Cell.MIN_METABOLIC)    #保证能量转化率在规定范围内
         return metabolic
 
-    def function(self):
+    def function(self) -> list:
         """
         蛋白质功能
         """
         sequence = self.sequence
         result = []
-        while True:
-            if sequence.startswith("HYCEKM") or sequence.startswith("HYCDKM"):
-                result.append()
-            elif sequence.startswith():
-                pass
-        pass
+        while sequence:
+            if sequence.startswith("GACLICYWSCCMN"):
+                result.append(self.antioxidant) # 抗氧化
+                sequence = sequence[13:]
+                env.debug("识别到抗氧化氨基酸序列")
+            elif sequence.startswith("SKNQK"):
+                result.append("待定")
+                sequence = sequence[5:]
+            elif sequence.startswith("GASL"):
+                result.append("待定")
+                sequence = sequence[4:]
+            else:
+                sequence = sequence[1:]
+        return result
+
+    @staticmethod
+    def antioxidant(cell:'Cell'):
+        """
+        抗氧化能力
+        """
+        cell.efficiency_increase += 0.1       
 
 class NADH(env.Energy):
     def __init__(self, value: float = 1.0) -> None:
@@ -229,9 +251,11 @@ class Cell:
         self.rna = self.DNA_translate(dna)
         self.protein_list = self.ribosome(self.rna)
         self.metabolic_rate = self._metabolic(self.protein_list)    # 细胞能量转化率
+        self.efficiency_increase = 0.0    # 转化效率增幅
         self.env = env1
-        self.move(self.x, self.y)
         self.color = self._color()
+        self.move(self.x, self.y)
+        self.function(self.protein_list)
 
     def __str__(self) -> str:
         return f"Cell' s Nema: {self.name}"
@@ -309,11 +333,13 @@ class Cell:
         for i in protein_list:
             metabolic += i.metabolic
         return round(metabolic/len(protein_list), 2)
-    
-    def consume_energy(self):
-        """执行基础能量消耗"""
-        self.energy -= self.metabolic_rate
-        self.age += 1
+
+    def function(self, protein_list:List[Protein]):
+        """根据细胞内的蛋白质执行操作"""
+        for protein in protein_list:
+            for protein_function in protein.function_list:
+                env.debug(protein_function)
+                protein_function(self)
 
     def move(self, x: int, y: int):
         """移动细胞至指定坐标"""
@@ -360,7 +386,7 @@ class Cell:
 
 if __name__ == "__main__":
     env1 = env.Environment()
-    cell1 = Cell(env1, 0, 0, dna=DNA(random_DNA.generate_dna(300)))
+    cell1 = Cell(env1, 0, 0, dna=DNA("TACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATT"))
     print(cell1.x, cell1.y)
     print(cell1.dna)
     print(cell1.rna.split)
@@ -369,3 +395,4 @@ if __name__ == "__main__":
     cell1.move(1, 1)
     print(env1.read(1, 1))
     print(cell1.color)
+    print(cell1.efficiency_increase)

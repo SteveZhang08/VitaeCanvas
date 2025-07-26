@@ -1,0 +1,12 @@
+add:
+增加了抗氧化蛋白质的功能函数（未完善）
+
+repair:
+修复了 vitae_system/cells.py/Cell.age 没有随着步数增长而增长的 bug
+修复了 库内模块作为主程序运行时出现 ImportError 的 bug
+
+remove:
+删除了 vitae_system/cells.py/Cell.consume_energy 函数
+
+issue:
+None
