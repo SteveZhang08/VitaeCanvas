@@ -198,7 +198,7 @@ class Protein:
         """
         抗氧化能力
         """
-        cell.efficiency_increase += 0.1       
+        cell.efficiency_increase += 0.1  # 细胞转化效率增加     
 
 class NADH(env.Energy):
     def __init__(self, value: float = 1.0) -> None:
