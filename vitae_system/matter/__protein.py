@@ -1,5 +1,5 @@
-from vitae_system.seq_matter.Enums import E_Protein, ADD_AMINO_ACIDS, INHIBIT_AMINO_ACIDS
-from vitae_system.seq_matter.Seq import ESeq
+from vitae_system.matter.Enums import E_Protein, ADD_AMINO_ACIDS, INHIBIT_AMINO_ACIDS
+from vitae_system.matter.Seq import ESeq
 from typing import Optional
 
 MAX_GENE_LENGTH: int = 300  # DNA的最大有效长度

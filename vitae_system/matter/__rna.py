@@ -1,6 +1,6 @@
-from vitae_system.seq_matter import Codon
-from vitae_system.seq_matter.Enums import E_RNA
-from vitae_system.seq_matter.Seq import ESeq
+from vitae_system.matter import Codon
+from vitae_system.matter.Enums import E_RNA
+from vitae_system.matter.Seq import ESeq
 from typing import List
 
 

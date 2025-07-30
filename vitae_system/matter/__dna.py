@@ -1,5 +1,5 @@
-from vitae_system.seq_matter.Enums import E_DNA
-from vitae_system.seq_matter.Seq import ESeq
+from vitae_system.matter.Enums import E_DNA
+from vitae_system.matter.Seq import ESeq
 
 
 class DNA(ESeq[E_DNA]):
