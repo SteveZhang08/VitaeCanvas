@@ -1,7 +1,7 @@
 # === VitaeCanvas ===
 # ./vitae_system/cells.py
 # by SteveZhang08
-# Helpers: None
+# Helpers: zyying
 # These AI_Models that provide help for the file:
 # Kimi    DeepSeek-R1
 
@@ -180,14 +180,19 @@ class Protein:
         result = []
         while sequence:
             if sequence.startswith("GACLICYWSCCMN"):
-                result.append(self.antioxidant) # 抗氧化
+                result.append(self.antioxidant) # 抗氧化蛋白
                 sequence = sequence[13:]
-                env.debug("识别到抗氧化氨基酸序列")
+            elif sequence.startswith("CYSTMTR"):
+                result.append(self.membrane_transoprt)  # 膜运输蛋白
+                sequence = sequence[7:]
+            elif sequence.startswith("ACTIN"):
+                result.append(self.cytoskeleton)  # 细胞骨架蛋白
+                sequence = sequence[5:]
             elif sequence.startswith("SKNQK"):
-                result.append("待定")
+                result.append(self.variation)   # 调控变异蛋白
                 sequence = sequence[5:]
             elif sequence.startswith("GASL"):
-                result.append("待定")
+                result.append(self.variation)   # 调控变异蛋白
                 sequence = sequence[4:]
             else:
                 sequence = sequence[1:]
@@ -198,8 +203,29 @@ class Protein:
         """
         抗氧化能力
         """
-        cell.efficiency_increase += 0.1  # 细胞转化效率增加     
+        cell.efficiency_increase += 0.1  # 细胞转化效率增加    
 
+    @staticmethod
+    def variation(cell:'Cell'):
+        """
+        变异能力
+        """
+        cell.variation_rate += 0.1  # 细胞变异概率增加    
+
+    @staticmethod
+    def membrane_transoprt(cell:'Cell'):
+        """
+        膜运输能力
+        """
+        cell.material_exchange_energy = max(cell.material_exchange_energy * 0.8, 2.5) # 细胞物质交换耗能减少
+
+    @staticmethod
+    def cytoskeleton(cell:'Cell'):
+        """
+        细胞骨架调控能力
+        """
+        cell.material_exchange_energy = max(cell.material_exchange_energy * 1.2, 2.5) # 细胞物质交换耗能增加
+    
 class NADH(env.Energy):
     def __init__(self, value: float = 1.0) -> None:
         super().__init__(value, diffuse=False)
@@ -222,18 +248,16 @@ class Sugar:
         糖的水解
         return: 糖的水解产物构成的列表
         """
-        # 能量值计算：(碳原子数 - 氧原子数)/3 + 2
-        energy_value = (self.C - self.O)/3 + 2
-        # NADH值计算：(氢原子数 - 碳原子数)/3
-        NADH_value = (self.H - self.C)/3
+        energy_value = max(0, (self.C * 12 - self.O * 16) / 180 * 29.2)
+        NADH_value = self.H / 24 * 2.5
         return [env.Energy(energy_value), NADH(NADH_value)]
 
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 
-    MAX_GENE_LENGTH = 300 #DNA的最大有效长度
-    MAX_METABOLIC = 0.8  #最大能量转化率
-    MIN_METABOLIC = 0.1  #最小能量转化率
+    MAX_GENE_LENGTH = 300 # DNA的最大有效长度
+    MAX_METABOLIC = 0.8  # 最大能量转化率
+    MIN_METABOLIC = 0.1  # 最小能量转化率
 
     def __init__(self, env1:env.Environment,x:int, y:int, dna:DNA = DNA("ATCG"), name = None) -> None:
         """
@@ -252,10 +276,14 @@ class Cell:
         self.protein_list = self.ribosome(self.rna)
         self.metabolic_rate = self._metabolic(self.protein_list)    # 细胞能量转化率
         self.efficiency_increase = 0.0    # 转化效率增幅
+        self.variation_rate = 0.1    # 变异概率
+        self.material_exchange_energy = 5   # 物质交换耗能
+
         self.env = env1
         self.color = self._color()
-        self.move(self.x, self.y)
         self.function(self.protein_list)
+        # 细胞初始化完成
+        self.move(self.x, self.y)           # 移动细胞到初始位置
 
     def __str__(self) -> str:
         return f"Cell' s Nema: {self.name}"

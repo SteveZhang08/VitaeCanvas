@@ -1,3 +1,10 @@
+# === VitaeCanvas ===
+# ./tools/GUI_DNA_Generation.py
+# by SteveZhang08
+# Helpers: None
+# These AI_Models that provide help for the file:
+# DeepSeek-R1
+
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 import DNA_Generation
@@ -5,10 +12,9 @@ import DNA_Generation
 class AminoAcidApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("GUI DNA_Generation by SteveZhang08")
+        self.root.title("GUI DNA_Generation")
         self.root.geometry("800x600")
-        
-        # 设置现代化风格
+
         self.style = ttk.Style()
         self.style.theme_use('clam')
         self.style.configure('TFrame', background='#2c3e50')
@@ -63,7 +69,7 @@ class AminoAcidApp:
         self.rna_label = ttk.Label(self.result_frame, text="RNA:")
         self.rna_label.grid(row=0, column=0, sticky='w')
         
-        # 添加RNA复制按钮
+        # RNA复制按钮
         self.copy_rna_button = ttk.Button(
             self.result_frame, 
             text="Copy RNA", 
@@ -86,7 +92,7 @@ class AminoAcidApp:
         self.dna_label = ttk.Label(self.result_frame, text="DNA:")
         self.dna_label.grid(row=2, column=0, sticky='w')
         
-        # 添加DNA复制按钮
+        # DNA复制按钮
         self.copy_dna_button = ttk.Button(
             self.result_frame, 
             text="Copy DNA", 

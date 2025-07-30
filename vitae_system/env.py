@@ -283,7 +283,7 @@ if __name__ == "__main__":
             out = []
             for a in i:
                 result = Environment.check_type_on_env(env1, a, Energy)
-                if result == -1 :
+                if result == None :
                     out.append([0])
                 else:
                     out.append([round(a[result].value, 2)])
