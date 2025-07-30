@@ -6,7 +6,7 @@
 if __name__ == "__main__":
     # 当作为主程序直接运行时，绝对导入同级模块
     from cells import*
-    from .env import*
+    from env import*
     import time
 else:
     # 当作为模块被导入时，相对导入库内同级模块
@@ -20,7 +20,6 @@ class MetabolismSystem:
         执行细胞完整代谢周期
         :param cell: 目标细胞实例（必须包含有效坐标）
         :param env: 环境控制器实例（必须已初始化）
-        :return: True表示存活，False表示死亡
         :raises ValueError: 当细胞坐标超出环境范围时抛出
         :side effect: 
             - 修改cell.energy值
@@ -29,33 +28,43 @@ class MetabolismSystem:
         """
         self.x = cell.x
         self.y = cell.y
-        self.metabolic_rate = cell.metabolic_rate
-        grid_data = env.read(cell.x, cell.y)
-        energy_index = env.check_type_on_env(grid_data, Energy)
-        if energy_index != None:
-            self.energy:Energy = grid_data[energy_index]
-        else:
-            debug("Energy对象未找到，自动初始化为0")
-            self.energy = Energy(0)
-            env.write(self.x, self.y, self.energy)
-        self.env = env
-        self.cell:Cell = grid_data[env.check_type_on_env(grid_data, Cell)]
-        self.cell.energy += self.metabolic_energy(self.absorb_energy())
+        self.env:Environment = env
+        self.cell:Cell = cell
+        self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
+        self.grid_data = self.env.read(self.x, self.y)
+        self.sugar:Sugar = self.absorb_sugar()
+        if self.sugar != None:
+            self.hydrolysis()
         self.cell.age += 1
         env.write(self.x, self.y, self.cell)
 
-    def absorb_energy(self) -> Energy:
-        if self.energy.value - 1 <= 0:
-            get_value = abs(self.energy.value)
-        else:
-            get_value = 1
-        self.energy.value = max(self.energy.value - 1, 0)
-        return Energy(get_value, diffuse = False)
-    
+    def absorb_sugar(self) -> Energy:
+        # 从环境中吸收糖类
+        sugar_idx = self.env.check_type_on_env(self.grid_data, Sugar)
+        self.sugar:Sugar = self.grid_data[sugar_idx]
+        if self.sugar != None:
+            # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
+            self.env.delete(self.x,self.y,sugar_idx)
+            self.cell.energy -= self.cell.material_exchange_energy
+            self.env.write(self.x,self.y,Energy(self.cell.material_exchange_energy))
+        return self.sugar
+
+    def hydrolysis(self):
+        '''
+        糖的水解
+        '''
+        self.NADH:NADH = self.sugar.Hydrolysis()['NADH']
+        self.cell.energy += self.metabolic_energy(self.sugar.Hydrolysis()['energy'])
+
     def metabolic_energy(self, energy:Energy) -> Energy:
+        # 计算细胞能量转换
+        # 计算吸收能量
         absorb = energy.value * self.metabolic_rate
+        # 计算输出能量
         out = energy.value - absorb
+        # 更新细胞能量
         self.energy.value += out
+        # 更新环境能量
         self.env.write(self.x, self.y, self.energy)
         return Energy(absorb, diffuse=False)   
 

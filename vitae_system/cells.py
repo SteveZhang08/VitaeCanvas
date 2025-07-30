@@ -235,22 +235,22 @@ class Sugar:
     def __init__(self, C:int=6, H:int=12, O:int=6) -> None:
         """
         糖的分子式
-        :param C: 糖的碳原子数量，小于1的值会被重置为1
-        :param H: 糖的氢原子数量，小于1的值会被重置为1
-        :param O: 糖的氧原子数量，小于1的值会被重置为1
+        :param C: 糖的碳原子数量
+        :param H: 糖的氢原子数量
+        :param O: 糖的氧原子数量
         """
-        self.C = max(C,1)
-        self.H = max(H,1)
-        self.O = max(O,1)
+        self.C = C
+        self.H = H
+        self.O = O
 
-    def Hydrolysis(self) -> list:
+    def Hydrolysis(self) -> dict:
         """
         糖的水解
-        return: 糖的水解产物构成的列表
+        return: 糖的水解产物构成的字典，键为产物名称，值为产物数量
         """
         energy_value = max(0, (self.C * 12 - self.O * 16) / 180 * 29.2)
         NADH_value = self.H / 24 * 2.5
-        return [env.Energy(energy_value), NADH(NADH_value)]
+        return {'energy':env.Energy(energy_value), 'NADH':NADH(NADH_value)}
 
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""

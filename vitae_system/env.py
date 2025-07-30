@@ -223,7 +223,9 @@ class Environment:
 
     def check_type_on_env(self, layer:list, check_type):
         """在网格中指定类型查找
-        返回值：所在位置的索引；
+        :param layer: 要查找的环境网格列表
+        :param check_type: 要查找的类型
+        return：所在位置的索引；
                None：不存在该类型"""
         for idx, item in enumerate(layer):
             if isinstance(item, check_type):
@@ -270,6 +272,15 @@ class Environment:
 
             # 源网格减少能量
             energy.value -= actual_diffusion * num_directions
+
+    def delete(self, x: int, y: int, idx: int):
+        """
+        删除环境中的元素
+        :param x: 要删除的元素的x坐标
+        :param y: 要删除的元素的y坐标
+        :param idx: 要删除的元素的索引
+        """
+        self.env[x][y].pop(idx)
 
 if __name__ == "__main__":
     env1 = Environment(width=10,height=10)
