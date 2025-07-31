@@ -38,6 +38,8 @@ class E_Protein(Enum):
     Y = 18
     V = 19
 
+class E_ProteinFunc(Enum):
+    ANTI_OXIDE = 0
 
 ADD_AMINO_ACIDS: Set[E_Protein] = {
     E_Protein.L, E_Protein.I, E_Protein.V,
