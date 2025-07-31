@@ -32,22 +32,23 @@ class MetabolismSystem:
         self.cell:Cell = cell
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
         self.grid_data = self.env.read(self.x, self.y)
-        self.sugar:Sugar = self.absorb_sugar()
+        self.absorb_sugar()
         if self.sugar != None:
             self.hydrolysis()
         self.cell.age += 1
         env.write(self.x, self.y, self.cell)
 
-    def absorb_sugar(self) -> Energy:
+    def absorb_sugar(self) -> Sugar:
         # 从环境中吸收糖类
         sugar_idx = self.env.check_type_on_env(self.grid_data, Sugar)
-        self.sugar:Sugar = self.grid_data[sugar_idx]
-        if self.sugar != None:
+        if sugar_idx == None:
+            self.sugar = None
+        else:
+            self.sugar:Sugar = self.grid_data[sugar_idx]
             # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
             self.env.delete(self.x,self.y,sugar_idx)
             self.cell.energy -= self.cell.material_exchange_energy
             self.env.write(self.x,self.y,Energy(self.cell.material_exchange_energy))
-        return self.sugar
 
     def hydrolysis(self):
         '''
