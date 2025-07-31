@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+from vitae_system.matter import Energy, NADH
 
 
 @dataclass
 class HydroProd:
-    energy_value: float
-    nadh_value: float
+    energy: Energy
+    nadh: NADH
 
 
 @dataclass
@@ -15,9 +16,9 @@ class Sugar:
     :param O: Oxygen
     """
 
-    C: int
-    H: int
-    O: int
+    C: int = 6
+    H: int = 12
+    O: int = 6
 
     def hydrolyze(self) -> HydroProd:
         """
@@ -29,4 +30,7 @@ class Sugar:
         # Calculate NADH value: (H - C)/3
         nadh_value: float = (self.H - self.C) / 3
 
-        return HydroProd(energy_value, nadh_value)
+        return HydroProd(
+            Energy(energy_value),
+            NADH(nadh_value),
+        )
