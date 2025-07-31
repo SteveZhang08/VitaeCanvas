@@ -1,3 +1,10 @@
+# === VitaeCanvas ===
+# ./tools/DNA_Generation.py
+# by SteveZhang08
+# Helpers: None
+# These AI_Models that provide help for the file:
+# DeepSeek-R1
+
 codon_table = {
         "UUU": "F", "UUC": "F",
         "UUA": "L", "UUG": "L", "CUU": "L", "CUC": "L", "CUA": "L", "CUG": "L",
