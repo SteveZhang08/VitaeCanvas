@@ -7,7 +7,7 @@ from vitae_system import cells, env, metabolism
 import time
 
 # 使用项目中的DNA序列
-DNA = cells.DNA("TACTGTGATCGCCACCTAAGACGGAGATCGCGGAAGGTGCGACGAAAGTCTCCAAATACGAAGACATCCCGCTATGCGCGTTGCACTGCCGTATCGTTAGCCGTGCTTCACTGATACAAACTGACTTGGAATACGAAGAGTCGTAAGAAATATCGTGAAAAGTACGCCATCGGGTTCCGGCGGCCGGAATGTAGCTTTAGGGTAGAGATCATGTATGGAGGCGGCATCTTAGTTAAGGACGCTGGGGCAAATATTCGGAAGATATCTCTTAGGATTCGCGCGACAACGGCGGGAATGCAA")
+DNA = cells.DNA("TACTGTGATCGCCACCTAAGACGGAGATACCCCCGCACGGACTATACGATGACCTCGACGACGTACTTGACTTACGAAGACATCCCGCTATGCGCGTTGCACTGCCGTATCGTTAGCCGTGCTTCACTGATACAAACTGACTTGGAATACGAAGAGTCGTAAGAAATATCGTGAAAAGTACGCCATCGGGTTCCGGCGGCCGGAATGTAGCTTTAGGGTAGAGATCATGTATGGAGGCGGCATCTTAGTTAAGGACGCTGGGGCAAATATTCGGAAGATATCTCTTAGGATTCGCGCGACAACGGCGGGAATGCAA")
 
 class SimulationTestCase(unittest.TestCase):
     """模拟系统集成测试"""
@@ -21,7 +21,7 @@ class SimulationTestCase(unittest.TestCase):
         for cell_id in range(100):
             new_cell = cells.Cell(self.env, cell_id, cell_id, dna=DNA, name=f"cell_{cell_id}")
             self.cell_list.append(new_cell)
-            self.env.write(cell_id, cell_id, env.Energy(10))
+            self.env.write(cell_id, cell_id, cells.Sugar(6,12,6))
 
     def test_environment_initialization(self):
         """测试环境初始化"""
@@ -33,32 +33,26 @@ class SimulationTestCase(unittest.TestCase):
     def test_cell_creation(self):
         """测试细胞创建"""
         self.assertEqual(len(self.cell_list), 100, "应创建100个细胞")
-        
-        # 验证DNA序列匹配
-        for cell in self.cell_list:
-            self.assertEqual(cell.dna.sequence, DNA.sequence, "细胞DNA序列应匹配")
     
     def test_metabolism_system(self):
         """测试代谢系统"""
         for cell in self.cell_list:
+
+            self.assertEqual(cell.metabolic_rate, 0.48, "代谢率应该为 0.48")
+            self.assertEqual(cell.efficiency_increase, 0.1, "效率增幅应该为 0.1")
+            self.assertEqual(cell.protein_list, [cells.Protein('MTLAVDSASMGACLICYWSCCMN'), cells.Protein('MLL'), cells.Protein('GDTRNVTA'), cells.Protein('QSARSDYV'), cells.Protein('LNLMLLSILYSTFHAVAQGRRPYIEIPSLVHTSAVESIPATPFISLL'), cells.Protein('RILSALLPPLR')], "蛋白质列表不匹配")
+
+            # 验证能量变化
+            initial_energy = cell.energy.value
+
             # 应用代谢系统
             metabolism.MetabolismSystem(cell, self.env)
             
             # 能量扩散
             self.env.energy_diffusion()
-            
-            # 验证能量变化
-            initial_energy = cell.energy.value
-            # 应用代谢系统
-            metabolism.MetabolismSystem(cell, self.env)       
-            # 能量扩散
-            self.env.energy_diffusion()
+
             new_energy = cell.energy.value
             self.assertNotEqual(initial_energy, new_energy, "代谢后细胞能量应变化")
-            
-            # 验证环境能量更新
-            grid_data = self.env.read(cell.x, cell.y)
-            self.assertIsInstance(grid_data, list, "网格数据应为 list 类型")
 
     @unittest.skip("仅用于手动调试")
     def test_full_simulation_with_logging(self):

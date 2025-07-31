@@ -178,6 +178,32 @@ class Protein:
         """
         sequence = self.sequence
         result = []
+        patterns = dict(
+            sorted(
+                {
+                    "GACLICYWSCCMN": self.antioxidant,  # 抗氧化蛋白
+                    "CYSTMTR": self.membrane_transoprt, # 膜运输蛋白
+                    "ACTIN": self.cytoskeleton,         # 细胞骨架蛋白
+                    "SKNQK": self.variation,            # 调控变异蛋白
+                    "GASL": self.variation,             # 调控变异蛋白
+                    "MAFLVRPYICGS": self.aerobic_respiration_enzymes,   # 有氧呼吸酶
+                }.items(),
+                key=lambda item: len(item[0]),  # 按key的长度排序
+                reverse=True  # 倒序（长键在前）
+            )
+        )
+        while sequence:
+            unmatched = True
+            for key, value in patterns.items():
+                if sequence.startswith(key):
+                    unmatched = False
+                    result.append(value)
+                    sequence = sequence[len(key):]
+                    break
+            if unmatched:
+                sequence = sequence[1:]
+        '''
+        旧的实现方式
         while sequence:
             if sequence.startswith("GACLICYWSCCMN"):
                 result.append(self.antioxidant) # 抗氧化蛋白
@@ -195,7 +221,7 @@ class Protein:
                 result.append(self.variation)   # 调控变异蛋白
                 sequence = sequence[4:]
             else:
-                sequence = sequence[1:]
+                sequence = sequence[1:]'''
         return result
 
     @staticmethod
@@ -225,7 +251,14 @@ class Protein:
         细胞骨架调控能力
         """
         cell.material_exchange_energy = max(cell.material_exchange_energy * 1.2, 2.5) # 细胞物质交换耗能增加
-    
+
+    @staticmethod
+    def aerobic_respiration_enzymes(cell:'Cell'):
+        """
+        有氧呼吸酶增益
+        """
+        cell.aerobic_respiration_enzymes += 0.1  # 细胞有氧呼吸酶增益增加
+
 class NADH(env.Energy):
     def __init__(self, value: float = 1.0) -> None:
         super().__init__(value, diffuse=False)
@@ -278,6 +311,7 @@ class Cell:
         self.efficiency_increase = 0.0    # 转化效率增幅
         self.variation_rate = 0.1    # 变异概率
         self.material_exchange_energy = 5   # 物质交换耗能
+        self.aerobic_respiration_enzymes = 0.0   # 有氧呼吸酶增益
 
         self.env = env1
         self.color = self._color()
@@ -286,7 +320,7 @@ class Cell:
         self.move(self.x, self.y)           # 移动细胞到初始位置
 
     def __str__(self) -> str:
-        return f"Cell' s Nema: {self.name}"
+        return f"Cell' s Name: {self.name}, Age: {self.age}"
 
     def normalize_dna(self, dna:DNA) -> DNA:
         """标准化DNA序列"""
@@ -334,7 +368,7 @@ class Cell:
         }
         start_codon_index = str(rna).find("AUG")     #寻找起始密码子的位置
         if start_codon_index == -1:
-            return ""  # 没有找到起始密码子，返回空字符串
+            return []  # 没有找到起始密码子，返回空列表
         protein_list = []   # 蛋白质列表
         protein = ""
         a = start_codon_index
