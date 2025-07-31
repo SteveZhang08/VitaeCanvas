@@ -12,7 +12,7 @@ class Protein(ESeq[E_Protein]):
         super().__init__(E_Protein)
         self.from_string(sequence)
 
-    def calc_metabolic(self) -> Optional[float]:
+    def __calc_metabolic(self) -> Optional[float]:
         """
         Metabolic Rate = (Num of Promoting AA − Num of Inhibitory AA) / Num of AA
         Promoting Amino Acids: L, I, V, Q, A, R, S, D
