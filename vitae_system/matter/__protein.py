@@ -1,16 +1,14 @@
-from vitae_system.matter.Enums import E_Protein, ADD_AMINO_ACIDS, INHIBIT_AMINO_ACIDS
-from vitae_system.matter.Seq import ESeq
-from typing import Optional
+from Constants import E_Protein, A_ADD_AMINO_ACIDS, A_INHIBIT_AMINO_ACIDS, E_ProteinFunc, A_PROTEIN_FUNC_RULES, \
+    I_MAX_GENE_LENGTH, F_MAX_METABOLIC, F_MIN_METABOLIC
+from __seq import BioSeq, E
+from __matcher import ProteinFunctionMatcher
 
-MAX_GENE_LENGTH: int = 300  # DNA的最大有效长度
-MAX_METABOLIC: float = 0.8  # 最大能量转化率
-MIN_METABOLIC: float = 0.1  # 最小能量转化率
+from typing import Optional, List, Tuple
 
 
-class Protein(ESeq[E_Protein]):
-    def __init__(self, sequence: str) -> None:
-        super().__init__(E_Protein)
-        self.from_string(sequence)
+class Protein(BioSeq[E_Protein]):
+    def __init__(self, sequence: str | List[E]) -> None:
+        super().__init__(E_Protein, sequence)
 
     def __calc_metabolic(self) -> Optional[float]:
         """
@@ -20,13 +18,28 @@ class Protein(ESeq[E_Protein]):
 
         Returns -1 if no sequence provided
         """
-        if not self.__seq:
+        if not self.sequence:
             return None
 
-        total: int = len(self.__seq)
-        add_count: int = sum(1 for aa in self.__seq if aa in ADD_AMINO_ACIDS)
-        inhibit_count: int = sum(1 for aa in self.__seq if aa in INHIBIT_AMINO_ACIDS)
+        total: int = len(self.sequence)
+        add_count: int = sum(1 for aa in self.sequence if aa in A_ADD_AMINO_ACIDS)
+        inhibit_count: int = sum(1 for aa in self.sequence if aa in A_INHIBIT_AMINO_ACIDS)
 
         raw_rate: float = (add_count - inhibit_count) / total
-        rate: float = min(max(raw_rate, MIN_METABOLIC), MAX_METABOLIC)
+        rate: float = min(max(raw_rate, F_MIN_METABOLIC), F_MAX_METABOLIC)
         return rate
+
+    def __rec_functions(self) -> Tuple[E_ProteinFunc, ...]:
+        """
+        Recognize functions of protein
+        """
+        matcher: ProteinFunctionMatcher = ProteinFunctionMatcher(A_PROTEIN_FUNC_RULES)
+        return matcher.match(self.sequence)
+
+    @property
+    def metabolic(self) -> float:
+        return self.__calc_metabolic()
+
+    @property
+    def functions(self) -> Tuple[E_ProteinFunc, ...]:
+        return self.__rec_functions()

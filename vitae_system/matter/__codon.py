@@ -1,6 +1,6 @@
 from typing import List
 from dataclasses import dataclass
-from Enums import E_RNA
+from Constants import E_RNA
 
 @dataclass(frozen=True)
 class Codon:

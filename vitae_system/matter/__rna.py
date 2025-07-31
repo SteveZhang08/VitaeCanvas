@@ -1,13 +1,12 @@
 from vitae_system.matter import Codon
-from vitae_system.matter.Enums import E_RNA
-from vitae_system.matter.Seq import ESeq
+from vitae_system.matter.Constants import E_RNA
+from vitae_system.matter.__seq import ESeq
 from typing import List
 
 
 class RNA(ESeq[E_RNA]):
     def __init__(self, sequence: str):
-        super().__init__(E_RNA)
-        self.from_string(sequence)
+        super().__init__(E_RNA, sequence)
 
     def to_codon(self) -> List[Codon]:
         """Split sequence into codons, by 3"""
