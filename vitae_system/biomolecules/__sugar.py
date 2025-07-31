@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from vitae_system.biomolecules import Energy, NADH
+from vitae_system.biomolecules import NADH
+from vitae_system.environment import Energy
 
 
 @dataclass
