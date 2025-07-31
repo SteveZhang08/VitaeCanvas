@@ -1,5 +1,5 @@
-from vitae_system.matter.Constants import E_DNA
-from vitae_system.matter.__seq import ESeq
+from vitae_system.biomolecules.Constants import E_DNA
+from vitae_system.biomolecules.__seq import ESeq
 
 
 class DNA(ESeq[E_DNA]):

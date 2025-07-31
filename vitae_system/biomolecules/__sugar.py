@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from vitae_system.matter import Energy, NADH
+from vitae_system.biomolecules import Energy, NADH
 
 
 @dataclass

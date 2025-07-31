@@ -1,6 +1,6 @@
-from vitae_system.matter import Codon
-from vitae_system.matter.Constants import E_RNA
-from vitae_system.matter.__seq import ESeq
+from vitae_system.biomolecules import Codon
+from vitae_system.biomolecules.Constants import E_RNA
+from vitae_system.biomolecules.__seq import ESeq
 from typing import List
 
 
