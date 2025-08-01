@@ -32,15 +32,17 @@ class MetabolismSystem:
         self.cell:Cell = cell
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
         self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)
+        self.NADH:NADH = self.cell.resource['NADH']
         self.grid_data = self.env.read(self.x, self.y)
         self.read_env()
         if Sugar in self.cell.abosrbed_substances:
+            debug(f"细胞{self.cell.name}开始进行糖的代谢")
             self.absorb_sugar()
             if self.sugar != None:
                 self.hydrolysis()
         if O2 in self.cell.abosrbed_substances:
-            nadh = self.cell.resource['NADH']
-            allow_nadh = NADH(max(nadh.value * self.aerobic_respiration_enzymes, 0.1))
+            nadh = self.NADH
+            allow_nadh = NADH(max(nadh.value * self.aerobic_respiration_enzymes, 1))
             need_o2 = O2(allow_nadh.value / 4)
             if need_o2.value <= self.O2.value:
                 self.aerobic_respiration(need_o2, allow_nadh)
@@ -48,6 +50,8 @@ class MetabolismSystem:
                 allow_nadh = NADH(self.O2.value*4)
                 self.aerobic_respiration(self.O2, allow_nadh)
         self.cell.age += 1
+        # 更新细胞数据
+        self.cell.resource['NADH'] = self.NADH
         # 更新环境数据
         self.env.write(self.x, self.y, self.env_energy)
         self.env.write(self.x, self.y, self.O2)
@@ -59,19 +63,10 @@ class MetabolismSystem:
             if idx != None:
                 return self.grid_data[idx]
             else:
-                return None
-        if read_type(Energy) != None:
-            self.env_energy:Energy = read_type(Energy)
-        else:
-            self.env_energy = Energy(0)
-        if read_type(O2) != None:
-            self.O2:O2 = read_type(O2)
-        else:
-            self.O2 = O2(0)
-        if read_type(H2O) != None:
-            self.H2O:H2O = read_type(H2O)
-        else:
-            self.H2O = H2O(0)
+                return _type(0)
+        self.env_energy:Energy = read_type(Energy)
+        self.O2:O2 = read_type(O2)
+        self.H2O:H2O = read_type(H2O)
 
     def absorb_sugar(self) -> Sugar:
         # 从环境中吸收糖类
@@ -84,13 +79,17 @@ class MetabolismSystem:
             self.env.delete(self.x,self.y,sugar_idx)
             self.cell.energy.value -= self.cell.material_exchange_energy
             self.env_energy.value += self.cell.material_exchange_energy
+            debug(f"细胞{self.cell.name}吸收了{str(self.sugar)}并耗能{self.cell.material_exchange_energy}")
 
     def hydrolysis(self):
         '''
         糖的水解
         '''
-        self.NADH:NADH = self.sugar.Hydrolysis()['NADH']
-        self.cell.energy.value += self.metabolic_energy(self.sugar.Hydrolysis()['energy']).value
+        hydrolysis_return = self.sugar.Hydrolysis()
+        self.NADH.value += hydrolysis_return['NADH'].value
+        energy_get:Energy = self.metabolic_energy(hydrolysis_return['energy'])
+        self.cell.energy.value += energy_get.value
+        debug(f"细胞{self.cell.name}进行了{self.sugar}的水解，并从中吸收了{energy_get.value}的能量")
 
     def metabolic_energy(self, energy:Energy) -> Energy:
         # 计算细胞能量转换
@@ -103,11 +102,13 @@ class MetabolismSystem:
 
     def aerobic_respiration(self, o2:O2, nadh:NADH):
         # 进行有氧呼吸
-        # 1*O2 + 4*NADH -> 10*Energy + 2*H2O
+        # 1*O2 + 4*NADH -> 50*Energy + 2*H2O
         self.O2.value -= o2.value
         self.cell.resource['NADH'].value -= nadh.value
         self.H2O.value += 2*o2.value
-        return self.metabolic_energy(Energy(10*o2.value))
+        energy_get:Energy = self.metabolic_energy(Energy(50*o2.value))
+        debug(f"细胞{self.cell.name}进行了有氧呼吸，并得到了{energy_get.value}的能量")
+        self.cell.energy.value += energy_get.value
 
 if __name__ == "__main__":
     env1 = env.Environment()

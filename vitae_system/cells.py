@@ -276,13 +276,18 @@ class Sugar:
         self.H = H
         self.O = O
 
+    def __str__(self):
+        """返回 Sugar 的字符串表示"""
+        return f"C{self.C}H{self.H}O{self.O}"
+
     def Hydrolysis(self) -> dict:
         """
         糖的水解
         return: 糖的水解产物构成的字典，键为产物名称，值为产物数量
         """
-        energy_value = max(0, (self.C * 12 - self.O * 16) / 180 * 29.2)
-        NADH_value = self.H / 24 * 2.5
+        energy_value = (self.C * 12 + self.H + self.O * 16) / 6
+        NADH_value = (self.C * 12 + self.H + self.O * 16) / 18
+        env.debug(f"糖{str(self)}的水解产生了{energy_value}的能量和{NADH_value}个NADH")
         return {'energy':env.Energy(energy_value), 'NADH':NADH(NADH_value)}
 
 class Cell:

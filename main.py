@@ -8,11 +8,11 @@ class SimulationController:
     def __init__(self) -> None:
         self.env = env.Environment(100, 100)
         cell_list = []
-        for id in range(100):
-            cell_list.append(cells.Cell(self.env, id, id, dna = DNA, name=id))
-            self.env.write(id, id, env.Energy(10))
-            print(self.env.read(id,id))
-            time.sleep(0.02)
+        cell_list.append(cells.Cell(self.env, 0, 0, dna = DNA, name=0))
+        resource_list = [env.Energy(10), env.O2(10), env.H2O(10), cells.Sugar(6,12,6)]
+        for resource in resource_list:
+            self.env.write(0, 0, resource)
+        print(self.env.read(0,0))
         print("细胞载入完成")
         for cell in cell_list:
             metabolism.MetabolismSystem(cell, self.env)
