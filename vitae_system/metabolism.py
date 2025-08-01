@@ -90,7 +90,7 @@ class MetabolismSystem:
         糖的水解
         '''
         self.NADH:NADH = self.sugar.Hydrolysis()['NADH']
-        self.cell.energy += self.metabolic_energy(self.sugar.Hydrolysis()['energy'])
+        self.cell.energy.value += self.metabolic_energy(self.sugar.Hydrolysis()['energy']).value
 
     def metabolic_energy(self, energy:Energy) -> Energy:
         # 计算细胞能量转换
