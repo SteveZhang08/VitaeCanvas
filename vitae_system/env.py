@@ -23,154 +23,30 @@ class Energy:
         """初始化 Energy 对象"""
         self.value = value  # 能量的大小
         self.diffuse = diffuse  # 能量是否能够扩散
+        self.name = "Energy"
 
     def __str__(self):
         """返回 Energy 对象的字符串表示"""
-        return f"Energy({self.value}, diffuse={self.diffuse})"
+        return f"{self.name}({self.value}, diffuse={self.diffuse})"
 
     def __repr__(self):
         """返回 Energy 对象的正式字符串表示"""
-        return f"Energy({self.value}, diffuse={self.diffuse})"
+        return f"{self.name}({self.value}, diffuse={self.diffuse})"
 
-    # 支持比较运算符
     def __eq__(self, other):
-        if isinstance(other, Energy):
+        if type(other) == type(self):
             return self.value == other.value and self.diffuse == other.diffuse
         return NotImplemented
 
-    def __lt__(self, other):
-        if isinstance(other, Energy):
-            return self.value < other.value
-        return NotImplemented
+class O2(Energy):
+    def __init__(self, value, diffuse=True):
+        super().__init__(value, diffuse)
+        self.name = "O2"
 
-    def __le__(self, other):
-        if isinstance(other, Energy):
-            return self.value <= other.value
-        return NotImplemented
-
-    def __gt__(self, other):
-        if isinstance(other, Energy):
-            return self.value > other.value
-        return NotImplemented
-
-    def __ge__(self, other):
-        if isinstance(other, Energy):
-            return self.value >= other.value
-        return NotImplemented
-
-    # 支持算术运算
-    def __add__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(self.value + other, self.diffuse)
-        elif isinstance(other, Energy):
-            return Energy(self.value + other.value, self.diffuse and other.diffuse)
-        return NotImplemented
-
-    def __sub__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(self.value - other, self.diffuse)
-        elif isinstance(other, Energy):
-            return Energy(self.value - other.value, self.diffuse and other.diffuse)
-        return NotImplemented
-
-    def __mul__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(self.value * other, self.diffuse)
-        elif isinstance(other, Energy):
-            return Energy(self.value * other.value, self.diffuse and other.diffuse)
-        return NotImplemented
-
-    def __truediv__(self, other):
-        if isinstance(other, (int, float)):
-            if other != 0:
-                return Energy(self.value / other, self.diffuse)
-            else:
-                raise ZeroDivisionError("除数不能为零")
-        elif isinstance(other, Energy):
-            if other.value != 0:
-                return Energy(self.value / other.value, self.diffuse and other.diffuse)
-            else:
-                raise ZeroDivisionError("除数不能为零")
-        return NotImplemented
-
-    def __pow__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(self.value ** other, self.diffuse)
-        elif isinstance(other, Energy):
-            return Energy(self.value ** other.value, self.diffuse and other.diffuse)
-        return NotImplemented
-
-    # 支持反向运算符
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    def __rsub__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(other - self.value, self.diffuse)
-        return NotImplemented
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def __rtruediv__(self, other):
-        if isinstance(other, (int, float)):
-            if self.value != 0:
-                return Energy(other / self.value, self.diffuse)
-            else:
-                raise ZeroDivisionError("除数不能为零")
-        return NotImplemented
-
-    def __rpow__(self, other):
-        if isinstance(other, (int, float)):
-            return Energy(other ** self.value, self.diffuse)
-        return NotImplemented
-
-    # 支持原地运算符
-    def __iadd__(self, other):
-        if isinstance(other, (int, float)):
-            self.value += other
-        elif isinstance(other, Energy):
-            self.value += other.value
-            self.diffuse = self.diffuse and other.diffuse
-        return self
-
-    def __isub__(self, other):
-        if isinstance(other, (int, float)):
-            self.value -= other
-        elif isinstance(other, Energy):
-            self.value -= other.value
-            self.diffuse = self.diffuse and other.diffuse
-        return self
-
-    def __imul__(self, other):
-        if isinstance(other, (int, float)):
-            self.value *= other
-        elif isinstance(other, Energy):
-            self.value *= other.value
-            self.diffuse = self.diffuse and other.diffuse
-        return self
-
-    def __itruediv__(self, other):
-        if isinstance(other, (int, float)):
-            if other != 0:
-                self.value /= other
-            else:
-                raise ZeroDivisionError("除数不能为零")
-        elif isinstance(other, Energy):
-            if other.value != 0:
-                self.value /= other.value
-                self.diffuse = self.diffuse and other.diffuse
-            else:
-                raise ZeroDivisionError("除数不能为零")
-        return self
-
-    def __ipow__(self, other):
-        if isinstance(other, (int, float)):
-            self.value **= other
-        elif isinstance(other, Energy):
-            self.value **= other.value
-            self.diffuse = self.diffuse and other.diffuse
-        return self
+class H2O(Energy):
+    def __init__(self, value, diffuse=True):
+        super().__init__(value, diffuse)
+        self.name = "H2O"
 
 class Environment:
     """二维环境模拟与协调"""

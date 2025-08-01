@@ -260,9 +260,9 @@ class Protein:
         cell.aerobic_respiration_enzymes += 0.1  # 细胞有氧呼吸酶增益增加
 
 class NADH(env.Energy):
-    def __init__(self, value: float = 1.0) -> None:
-        super().__init__(value, diffuse=False)
-        self.value = value
+    def __init__(self, value, diffuse=False):
+        super().__init__(value, diffuse)
+        self.name = "NADH"
 
 class Sugar:
     def __init__(self, C:int=6, H:int=12, O:int=6) -> None:
@@ -312,6 +312,8 @@ class Cell:
         self.variation_rate = 0.1    # 变异概率
         self.material_exchange_energy = 5   # 物质交换耗能
         self.aerobic_respiration_enzymes = 0.0   # 有氧呼吸酶增益
+        self.abosrbed_substances = [Sugar, env.O2]           # 细胞允许吸收的物质列表
+        self.resource = {'NADH':NADH(10)}
 
         self.env = env1
         self.color = self._color()

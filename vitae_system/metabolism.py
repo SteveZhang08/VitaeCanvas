@@ -31,18 +31,47 @@ class MetabolismSystem:
         self.env:Environment = env
         self.cell:Cell = cell
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
+        self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)
         self.grid_data = self.env.read(self.x, self.y)
-        idx = env.check_type_on_env(self.grid_data, Energy)
-        if idx != None:
-            self.env_energy:Energy = self.grid_data[idx]
+        self.read_env()
+        if Sugar in self.cell.abosrbed_substances:
+            self.absorb_sugar()
+            if self.sugar != None:
+                self.hydrolysis()
+        if O2 in self.cell.abosrbed_substances:
+            nadh = self.cell.resource['NADH']
+            allow_nadh = NADH(max(nadh.value * self.aerobic_respiration_enzymes, 0.1))
+            need_o2 = O2(allow_nadh.value / 4)
+            if need_o2.value <= self.O2.value:
+                self.aerobic_respiration(need_o2, allow_nadh)
+            else:
+                allow_nadh = NADH(self.O2.value*4)
+                self.aerobic_respiration(self.O2, allow_nadh)
+        self.cell.age += 1
+        # 更新环境数据
+        self.env.write(self.x, self.y, self.env_energy)
+        self.env.write(self.x, self.y, self.O2)
+        self.env.write(self.x, self.y, self.H2O)
+
+    def read_env(self):
+        def read_type(_type):
+            idx = self.env.check_type_on_env(self.grid_data, _type)
+            if idx != None:
+                return self.grid_data[idx]
+            else:
+                return None
+        if read_type(Energy) != None:
+            self.env_energy:Energy = read_type(Energy)
         else:
             self.env_energy = Energy(0)
-        self.absorb_sugar()
-        if self.sugar != None:
-            self.hydrolysis()
-        self.cell.age += 1
-        # 更新环境能量
-        self.env.write(self.x, self.y, self.env_energy)
+        if read_type(O2) != None:
+            self.O2:O2 = read_type(O2)
+        else:
+            self.O2 = O2(0)
+        if read_type(H2O) != None:
+            self.H2O:H2O = read_type(H2O)
+        else:
+            self.H2O = H2O(0)
 
     def absorb_sugar(self) -> Sugar:
         # 从环境中吸收糖类
@@ -70,7 +99,15 @@ class MetabolismSystem:
         # 计算输出能量
         out = energy.value - absorb
         self.env_energy.value += out
-        return Energy(absorb, diffuse=False)   
+        return Energy(absorb, diffuse=False)
+
+    def aerobic_respiration(self, o2:O2, nadh:NADH):
+        # 进行有氧呼吸
+        # 1*O2 + 4*NADH -> 10*Energy + 2*H2O
+        self.O2.value -= o2.value
+        self.cell.resource['NADH'].value -= nadh.value
+        self.H2O.value += 2*o2.value
+        return self.metabolic_energy(Energy(10*o2.value))
 
 if __name__ == "__main__":
     env1 = env.Environment()
