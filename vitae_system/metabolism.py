@@ -82,7 +82,7 @@ class MetabolismSystem:
             self.sugar:Sugar = self.grid_data[sugar_idx]
             # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
             self.env.delete(self.x,self.y,sugar_idx)
-            self.cell.energy -= self.cell.material_exchange_energy
+            self.cell.energy.value -= self.cell.material_exchange_energy
             self.env_energy.value += self.cell.material_exchange_energy
 
     def hydrolysis(self):
