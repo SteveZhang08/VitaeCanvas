@@ -26,8 +26,8 @@ class SimulationTestCase(unittest.TestCase):
     def test_environment_initialization(self):
         """测试环境初始化"""
         # 验证环境尺寸
-        self.assertEqual(self.env.width, 101, "环境宽度应为100")
-        self.assertEqual(self.env.height, 101, "环境高度应为100")
+        self.assertEqual(self.env.width, 100, "环境宽度应为100")
+        self.assertEqual(self.env.height, 100, "环境高度应为100")
 
 
     def test_cell_creation(self):
