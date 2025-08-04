@@ -118,7 +118,6 @@ class Environment:
 
     def energy_diffusion(self):
         def add_energy(x, y, value):
-            # 直接修改现有 Energy 值，避免覆盖
             layer = self.read(x, y)
             z = self.check_type_on_env(layer, Energy)
             if z != None:
@@ -130,7 +129,8 @@ class Environment:
         for location in self.find_type(Energy):
             x, y, z = location
             energy = self.read(x, y)[z]
-            if energy.value <= 0:
+            if energy.value <= 0.1:
+                # 值小于 0.1 的能量已没有扩散必要，防止整个环境被充满极低的能量值造成性能浪费
                 continue
 
             diffusion_value = energy.value * DIFFUSION_RATE
@@ -165,14 +165,15 @@ class Environment:
         """
         if x < 0 or x > self.width or y < 0 or y > self.height:
             raise Environment_Error(f"[function]delete:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
+        content = self.env[(x, y)][idx]
         self.env[(x, y)].pop(idx)
-        # 待完善：删除后需要更新类型表
-        # self.type_register_table[type(content)].remove((x, y))
+        # 删除后需要更新类型表
+        self.type_register_table[type(content)].remove((x, y))
 
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)
     energy_1 = Energy(2, diffuse=True)
-    env1.write(1, 0, energy_1)
+    env1.write(0, 0, energy_1)
     env1.energy_diffusion()
     import time
     count = 0
