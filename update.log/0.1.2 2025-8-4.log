@@ -6,7 +6,7 @@ vitae_system/cells.py 中新增了 Sugar 和 NADH 类
 细胞通过糖类 + 有氧呼吸获得能量
 
 repair:
-修复了Environment 在进行 Energy 扩散时未检查 Energy.diffuse 是否为 True 的情况
+修复了Environment 在进行 Energy 扩散时未检查 Energy.diffuse 是否为 True 的 bug
 
 remove:
 删除了 vitae_system/env.py/Environment.energy_diffusion 函数
