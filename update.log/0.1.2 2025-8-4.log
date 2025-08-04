@@ -1,0 +1,15 @@
+add:
+将环境改为 {(x,y):[]} 的存储方式，并且配合惰性加载以优化性能
+vitae_system/env.py/Environment 中新增了 resource_diffusion_type 和 resource_diffusion 方法以应对多种资源需要扩散的情况
+vitae_system/env.py 中新增了 H2O 和 O2 类
+vitae_system/cells.py 中新增了 Sugar 和 NADH 类
+细胞通过糖类 + 有氧呼吸获得能量
+
+repair:
+修复了Environment 在进行 Energy 扩散时未检查 Energy.diffuse 是否为 True 的情况
+
+remove:
+删除了 vitae_system/env.py/Environment.energy_diffusion 函数
+
+issue:
+None

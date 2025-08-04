@@ -116,24 +116,32 @@ class Environment:
         warning(f"[function]check_type_on_env:警告，类型{check_type}未找到！\nWarning, data type {check_type} not found!")
         return None
 
-    def energy_diffusion(self):
-        def add_energy(x, y, value):
+    def resources_diffusion_type(self, diffusion_type):
+        '''
+        扩散指定的资源类型
+        :param diffusion_type: 资源类型
+        '''
+        def add_resources(x, y, add_type, value):
             layer = self.read(x, y)
-            z = self.check_type_on_env(layer, Energy)
+            z = self.check_type_on_env(layer, add_type)
             if z != None:
                 layer[z].value += value
             else:
-                self.write(x, y, Energy(value))
+                self.write(x, y, add_type(value))
 
         # 统一扩散方向数和计算逻辑
-        for location in self.find_type(Energy):
+        location_list = self.find_type(diffusion_type)
+        if location_list == None:
+            # 待扩散的类型不存在，跳过
+            return None
+        for location in location_list:
             x, y, z = location
-            energy = self.read(x, y)[z]
-            if energy.value <= 0.1:
-                # 值小于 0.1 的能量已没有扩散必要，防止整个环境被充满极低的能量值造成性能浪费
+            wait_to_diffusion_type = self.read(x, y)[z]
+            if wait_to_diffusion_type.value <= 0.1 or wait_to_diffusion_type.diffuse == False:
+                # 值小于 0.1 的资源已没有扩散必要，防止整个环境被充满极低的资源值造成性能浪费
                 continue
 
-            diffusion_value = energy.value * DIFFUSION_RATE
+            diffusion_value = wait_to_diffusion_type.value * DIFFUSION_RATE
             directions = []
 
             # 计算有效扩散方向
@@ -146,15 +154,23 @@ class Environment:
             if num_directions == 0:
                 continue
 
-            max_diffusion = energy.value / (1 + num_directions)  # 稳定约束
+            max_diffusion = wait_to_diffusion_type.value / (1 + num_directions)  # 稳定约束
             actual_diffusion = min(diffusion_value, max_diffusion)
 
             # 向有效方向扩散
             for dx, dy in directions:
-                add_energy(x + dx, y + dy, actual_diffusion)
+                add_resources(x + dx, y + dy, diffusion_type, actual_diffusion)
 
             # 源网格减少能量
-            energy.value -= actual_diffusion * num_directions
+            wait_to_diffusion_type.value -= actual_diffusion * num_directions
+
+    def resources_diffusion(self):
+        '''
+        扩散所有资源类型
+        '''
+        self.resources_diffusion_type(Energy)
+        self.resources_diffusion_type(H2O)
+        self.resources_diffusion_type(O2)
 
     def delete(self, x: int, y: int, idx: int):
         """
@@ -172,9 +188,9 @@ class Environment:
 
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)
-    energy_1 = Energy(2, diffuse=True)
+    energy_1 = Energy(200, diffuse=False)
     env1.write(0, 0, energy_1)
-    env1.energy_diffusion()
+    env1.resources_diffusion()
     import time
     count = 0
     while count < 10:
@@ -189,6 +205,6 @@ if __name__ == "__main__":
                 else:
                     out.append([round(grid_content[result].value, 2)])
             print(out)
-        env1.energy_diffusion()
+        env1.resources_diffusion()
         time.sleep(1)
         count += 1

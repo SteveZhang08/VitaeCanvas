@@ -119,5 +119,5 @@ if __name__ == "__main__":
         MetabolismSystem(cell1, env1)
         print(cell1.energy)
         print(f'细胞当前坐标能量值：{env1.read(cell1.x, cell1.y)[env1.check_type_on_env(env1.read(cell1.x, cell1.y), Energy)]}')
-        env1.energy_diffusion()
+        env1.resources_diffusion()
         time.sleep(1)

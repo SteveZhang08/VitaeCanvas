@@ -1,5 +1,5 @@
 add:
-增加了抗氧化蛋白质的功能函数（未完善）
+增加了抗氧化蛋白质的功能函数
 
 repair:
 修复了 vitae_system/cells.py/Cell.age 没有随着步数增长而增长的 bug
@@ -9,4 +9,4 @@ remove:
 删除了 vitae_system/cells.py/Cell.consume_energy 函数
 
 issue:
-None
+Environment 在进行 Energy 扩散时未检查 Energy.diffuse 是否为 True ，导致不可扩散的能量也被扩散

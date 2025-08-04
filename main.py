@@ -16,7 +16,7 @@ class SimulationController:
         print("细胞载入完成")
         for cell in cell_list:
             metabolism.MetabolismSystem(cell, self.env)
-            self.env.energy_diffusion()
+            self.env.resources_diffusion()
             print(f"细胞{cell.name}代谢完成，当前能量值：{round(cell.energy.value,2)}")
             print(f"细胞当前所在位置信息：\n坐标：{cell.name, cell.name}")
             grid_data = self.env.read(cell.name, cell.name)
