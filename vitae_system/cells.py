@@ -7,15 +7,19 @@
 
 import re
 from typing import List
+import math
 
 if __name__ == "__main__":
     # 当作为主程序直接运行时，绝对导入同级模块
     import random_DNA
     import env
+    import vitae_math
+
 else:
     # 当作为模块被导入时，相对导入库内同级模块
     from . import random_DNA
     from . import env
+    from . import vitae_math
 
 class CellError(Exception):
     """细胞活动异常"""
@@ -187,6 +191,8 @@ class Protein:
                     "SKNQK": self.variation,            # 调控变异蛋白
                     "GASL": self.variation,             # 调控变异蛋白
                     "MAFLVRPYICGS": self.aerobic_respiration_enzymes,   # 有氧呼吸酶
+                    "VVV": self.env_receptor,                  # 环境受体蛋白
+                    "VYE":self.move,                            # 移动蛋白
                 }.items(),
                 key=lambda item: len(item[0]),  # 按key的长度排序
                 reverse=True  # 倒序（长键在前）
@@ -259,6 +265,68 @@ class Protein:
         """
         cell.aerobic_respiration_enzymes += 0.1  # 细胞有氧呼吸酶增益增加
 
+    @staticmethod
+    def env_receptor(cell: 'Cell'):
+        """
+        环境受体蛋白增益
+        自动扫描四个方向的环境能量值，并更新细胞状态
+        """
+        for direction, (dx, dy), key in [
+            ('up', (0, -1), 'env_energy_up'),
+            ('down', (0, 1), 'env_energy_down'),
+            ('left', (-1, 0), 'env_energy_left'),
+            ('right', (1, 0), 'env_energy_right')]:
+            try:
+                # 直接读取并解包有效结果
+                env.debug(f"细胞{cell.name}的{direction}方向环境坐标为({cell.x + dx},{cell.y + dy})")
+                if grid_content := cell.env.read(cell.x + dx, cell.y + dy):
+                    env.debug(f"数据为{grid_content}")
+                    idx = cell.env.check_type_on_env(grid_content, env.Energy)
+                    if idx != None:
+                        cell.info[key] = grid_content[idx].value
+                        env.debug(f"细胞{cell.name}的{direction}方向环境能量值为{cell.info[key]}")
+            except Exception as e:
+                env.warning(f"方向 {direction} 读取失败: {e}")
+
+    @staticmethod
+    def move(cell:'Cell'):
+        """
+        移动能力
+        """
+        up = down = left = right = 0
+        up_weight = down_weight = left_weight = right_weight = 0
+
+        if num := cell.info.get('env_energy_up'):
+            up_weight = vitae_math.vac_curve(num)
+        if num := cell.info.get('env_energy_down'):
+            down_weight = vitae_math.vac_curve(num)
+        if num := cell.info.get('env_energy_left'):
+            left_weight = vitae_math.vac_curve(num)
+        if num := cell.info.get('env_energy_right'):
+            right_weight = vitae_math.vac_curve(num)
+        
+        up = up_weight * 1j
+        down = down_weight * 1j
+        left = left_weight * -1
+        right = right_weight * 1
+
+        direction_vector:complex = up + down + left + right
+        if direction_vector == 0:
+            env.debug(f"细胞{cell.name}不打算移动")
+            return
+        direction = math.degrees(math.atan2(direction_vector.imag, direction_vector.real))
+
+        env.debug(f"细胞{cell.name}的移动方向为{direction}")
+
+        if direction > -45 and direction <= 45:
+            cell.move(cell.x + 1,cell.y)
+        elif direction > 45 and direction <= 135:
+            cell.move(cell.x,cell.y + 1)
+        elif direction > 135 or direction <= -135:
+            cell.move(cell.x - 1,cell.y)
+        elif direction > -135 and direction <= -45:
+            cell.move(cell.x,cell.y - 1)
+
 class NADH(env.Energy):
     def __init__(self, value, diffuse=False):
         super().__init__(value, diffuse)
@@ -319,7 +387,7 @@ class Cell:
         self.aerobic_respiration_enzymes = 0.0   # 有氧呼吸酶增益
         self.abosrbed_substances = [Sugar, env.O2]           # 细胞允许吸收的物质列表
         self.resource = {'NADH':NADH(10)}
-
+        self.info = {}
         self.env = env1
         self.color = self._color()
         self.function(self.protein_list)
@@ -407,7 +475,6 @@ class Cell:
         """根据细胞内的蛋白质执行操作"""
         for protein in protein_list:
             for protein_function in protein.function_list:
-                env.debug(protein_function)
                 protein_function(self)
 
     def move(self, x: int, y: int):
@@ -455,13 +522,13 @@ class Cell:
 
 if __name__ == "__main__":
     env1 = env.Environment()
-    cell1 = Cell(env1, 0, 0, dna=DNA("TACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATTTACCCACGAACAGAATAAACAATAACCAGAACAACATACTTAATT"))
-    print(cell1.x, cell1.y)
-    print(cell1.dna)
-    print(cell1.rna.split)
+    env1.write(0,1,env.Energy(200))
+    cell1 = Cell(env1, 0, 0, dna=DNA("TACCCCCGCACGGACTATACGATGACCTCGACGACGTACTTGACTACGATGTCGTGCTACTGCTCCACTCGCACGTGCTATTTGACTTCGTTCTTGGTCTTCACTCCCCGCTCGGACACTTACCGCAAGGACCACTCCGGCATGTATACGCCCTCGACTCACCACCACACTCACATGCTCACT"))
+    #print(cell1.x, cell1.y)
+    #print(cell1.dna)
+    #print(cell1.rna.split)
     print(cell1.protein_list)
-    print(cell1.metabolic_rate)
-    cell1.move(1, 1)
-    print(env1.read(1, 1))
-    print(cell1.color)
-    print(cell1.efficiency_increase)
+    print(f"细胞{cell1.name}的能量转化率为{cell1.metabolic_rate}")
+    print(env1.read(0, 1))
+    print(f"细胞{cell1.name}的颜色RGB为{cell1.color}")
+    print(f"细胞{cell1.name}的转化率增幅{cell1.efficiency_increase}")
