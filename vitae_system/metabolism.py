@@ -30,6 +30,7 @@ class MetabolismSystem:
         self.y = cell.y
         self.env:Environment = env
         self.cell:Cell = cell
+        self.cell.metabolic_init()
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
         self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)
         self.NADH:NADH = self.cell.resource['NADH']
@@ -52,6 +53,12 @@ class MetabolismSystem:
         self.cell.age += 1
         # 更新细胞数据
         self.cell.resource['NADH'] = self.NADH
+
+        # 处理细胞动作
+        target_functions = {'env_receptor', 'move'}
+        for protein in self.cell.protein_list:
+            for func_name in target_functions.intersection(protein.function_dict.keys()):
+                protein.function_dict[func_name](self.cell, call=True)
         # 更新环境数据
         self.env.write(self.x, self.y, self.env_energy)
         self.env.write(self.x, self.y, self.O2)

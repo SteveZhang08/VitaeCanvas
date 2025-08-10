@@ -123,7 +123,7 @@ class Protein:
             raise CellError('Protein error: The protein is "None"' + "\n蛋白质错误:蛋白质为空")
         self.sequence = self._validate_sequence(sequence)
         self.metabolic = self._metabolic(self.sequence)
-        self.function_list = self.function()
+        self.function_dict = self.function()
 
     def _validate_sequence(self, sequence):
         """验证序列是否只包含合法氨基酸"""
@@ -176,23 +176,23 @@ class Protein:
         metabolic = max(min(a/len(sequence), Cell.MAX_METABOLIC),Cell.MIN_METABOLIC)    #保证能量转化率在规定范围内
         return metabolic
 
-    def function(self) -> list:
+    def function(self) -> dict:
         """
         蛋白质功能
         """
         sequence = self.sequence
-        result = []
+        result = {}
         patterns = dict(
             sorted(
                 {
-                    "GACLICYWSCCMN": self.antioxidant,  # 抗氧化蛋白
-                    "CYSTMTR": self.membrane_transoprt, # 膜运输蛋白
-                    "ACTIN": self.cytoskeleton,         # 细胞骨架蛋白
-                    "SKNQK": self.variation,            # 调控变异蛋白
-                    "GASL": self.variation,             # 调控变异蛋白
-                    "MAFLVRPYICGS": self.aerobic_respiration_enzymes,   # 有氧呼吸酶
-                    "VVV": self.env_receptor,                  # 环境受体蛋白
-                    "VYE":self.move,                            # 移动蛋白
+                    "GACLICYWSCCMN": (self.antioxidant,"antioxidant"),  # 抗氧化蛋白
+                    "CYSTMTR": (self.membrane_transoprt,"membrane_transoprt"), # 膜运输蛋白
+                    "ACTIN": (self.cytoskeleton,"cytoskeleton"),         # 细胞骨架蛋白
+                    "SKNQK": (self.variation,"variation"),            # 调控变异蛋白
+                    "GASL": (self.variation,"variation"),             # 调控变异蛋白
+                    "MAFLVRPYICGS": (self.aerobic_respiration_enzymes,"aerobic_respiration_enzymes"),   # 有氧呼吸酶
+                    "VVV": (self.env_receptor,"env_receptor"),                  # 环境受体蛋白
+                    "VYE":(self.move,"move"),                            # 移动蛋白
                 }.items(),
                 key=lambda item: len(item[0]),  # 按key的长度排序
                 reverse=True  # 倒序（长键在前）
@@ -203,31 +203,11 @@ class Protein:
             for key, value in patterns.items():
                 if sequence.startswith(key):
                     unmatched = False
-                    result.append(value)
+                    result[value[1]] = value[0]
                     sequence = sequence[len(key):]
                     break
             if unmatched:
                 sequence = sequence[1:]
-        '''
-        旧的实现方式
-        while sequence:
-            if sequence.startswith("GACLICYWSCCMN"):
-                result.append(self.antioxidant) # 抗氧化蛋白
-                sequence = sequence[13:]
-            elif sequence.startswith("CYSTMTR"):
-                result.append(self.membrane_transoprt)  # 膜运输蛋白
-                sequence = sequence[7:]
-            elif sequence.startswith("ACTIN"):
-                result.append(self.cytoskeleton)  # 细胞骨架蛋白
-                sequence = sequence[5:]
-            elif sequence.startswith("SKNQK"):
-                result.append(self.variation)   # 调控变异蛋白
-                sequence = sequence[5:]
-            elif sequence.startswith("GASL"):
-                result.append(self.variation)   # 调控变异蛋白
-                sequence = sequence[4:]
-            else:
-                sequence = sequence[1:]'''
         return result
 
     @staticmethod
@@ -266,11 +246,14 @@ class Protein:
         cell.aerobic_respiration_enzymes += 0.1  # 细胞有氧呼吸酶增益增加
 
     @staticmethod
-    def env_receptor(cell: 'Cell'):
+    def env_receptor(cell: 'Cell',call = False):
         """
         环境受体蛋白增益
         自动扫描四个方向的环境能量值，并更新细胞状态
         """
+        if not call:
+            return
+
         for direction, (dx, dy), key in [
             ('up', (0, -1), 'env_energy_up'),
             ('down', (0, 1), 'env_energy_down'),
@@ -289,10 +272,13 @@ class Protein:
                 env.warning(f"方向 {direction} 读取失败: {e}")
 
     @staticmethod
-    def move(cell:'Cell'):
+    def move(cell:'Cell',call=False):
         """
         移动能力
         """
+        if not call:
+            return
+
         up = down = left = right = 0
         up_weight = down_weight = left_weight = right_weight = 0
 
@@ -316,15 +302,17 @@ class Protein:
             return
         direction = math.degrees(math.atan2(direction_vector.imag, direction_vector.real))
 
-        env.debug(f"细胞{cell.name}的移动方向为{direction}")
-
         if direction > -45 and direction <= 45:
+            env.debug(f"细胞{cell.name}打算移动到({cell.x + 1},{cell.y})")
             cell.move(cell.x + 1,cell.y)
         elif direction > 45 and direction <= 135:
+            env.debug(f"细胞{cell.name}打算移动到({cell.x},{cell.y + 1})")
             cell.move(cell.x,cell.y + 1)
         elif direction > 135 or direction <= -135:
+            env.debug(f"细胞{cell.name}打算移动到({cell.x - 1},{cell.y})")
             cell.move(cell.x - 1,cell.y)
         elif direction > -135 and direction <= -45:
+            env.debug(f"细胞{cell.name}打算移动到({cell.x},{cell.y - 1})")
             cell.move(cell.x,cell.y - 1)
 
 class NADH(env.Energy):
@@ -347,6 +335,9 @@ class Sugar:
     def __str__(self):
         """返回 Sugar 的字符串表示"""
         return f"C{self.C}H{self.H}O{self.O}"
+
+    def __repr__(self) -> str:
+        return f"Sugar(C={self.C}, H={self.H}, O={self.O})"
 
     def Hydrolysis(self) -> dict:
         """
@@ -379,7 +370,18 @@ class Cell:
         self.y = y
         self.dna = self.normalize_dna(dna)
         self.rna = self.DNA_translate(dna)
-        self.protein_list = self.ribosome(self.rna)
+        self.protein_list:List[Protein] = self.ribosome(self.rna)        
+        self.info = {}
+        self.env = env1
+        self.color = self._color()
+        self.metabolic_init()
+        # 细胞初始化完成
+        self.move(self.x, self.y)           # 移动细胞到初始位置
+
+    def metabolic_init(self):
+        """
+        细胞代谢初始化：在代谢时被调用进行初始化
+        """
         self.metabolic_rate = self._metabolic(self.protein_list)    # 细胞能量转化率
         self.efficiency_increase = 0.0    # 转化效率增幅
         self.variation_rate = 0.1    # 变异概率
@@ -387,15 +389,13 @@ class Cell:
         self.aerobic_respiration_enzymes = 0.0   # 有氧呼吸酶增益
         self.abosrbed_substances = [Sugar, env.O2]           # 细胞允许吸收的物质列表
         self.resource = {'NADH':NADH(10)}
-        self.info = {}
-        self.env = env1
-        self.color = self._color()
         self.function(self.protein_list)
-        # 细胞初始化完成
-        self.move(self.x, self.y)           # 移动细胞到初始位置
 
     def __str__(self) -> str:
         return f"Cell' s Name: {self.name}, Age: {self.age}"
+
+    def __repr__(self) -> str:
+        return f"Cell' s Name: {self.name}, Age: {self.age}, Energy: {self.energy}"
 
     def normalize_dna(self, dna:DNA) -> DNA:
         """标准化DNA序列"""
@@ -474,7 +474,7 @@ class Cell:
     def function(self, protein_list:List[Protein]):
         """根据细胞内的蛋白质执行操作"""
         for protein in protein_list:
-            for protein_function in protein.function_list:
+            for protein_function in protein.function_dict.values():
                 protein_function(self)
 
     def move(self, x: int, y: int):
