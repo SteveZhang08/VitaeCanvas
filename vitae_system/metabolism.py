@@ -118,6 +118,7 @@ class MetabolismSystem:
         self.cell.energy.value += energy_get.value
 
 if __name__ == "__main__":
+    import random_DNA
     env1 = env.Environment()
     env1.write(0,0,Energy(114))
     cell1 = Cell(env1, 0, 0, dna=DNA(random_DNA.generate_dna(9)))

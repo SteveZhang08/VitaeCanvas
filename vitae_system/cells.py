@@ -237,6 +237,7 @@ class Protein:
         细胞骨架调控能力
         """
         cell.material_exchange_energy = max(cell.material_exchange_energy * 1.2, 2.5) # 细胞物质交换耗能增加
+        cell.strong += 1
 
     @staticmethod
     def aerobic_respiration_enzymes(cell:'Cell'):
@@ -374,6 +375,7 @@ class Cell:
         self.info = {}
         self.env = env1
         self.color = self._color()
+        self.strong = 5     # 细胞结构强度
         self.metabolic_init()
         # 细胞初始化完成
         self.move(self.x, self.y)           # 移动细胞到初始位置
@@ -479,6 +481,18 @@ class Cell:
 
     def move(self, x: int, y: int):
         """移动细胞至指定坐标"""
+        if not (0 <= x < self.env.width and 0 <= y < self.env.height):
+            env.debug(f"Cell {self.name} tried to move out of bounds.\n细胞 {self.name} 试图冲击边界")
+            self.strong -= 1
+            return False
+        grid_data = self.env.read(x, y)
+        idx = self.env.check_type_on_env(grid_data, Cell)
+        if idx != None: # 如果新网格中存在细胞
+            self.strong -= 1
+            other_cell:Cell = grid_data[idx]
+            other_cell.strong -= 1
+            env.debug(f"细胞 {self.name} 与 {other_cell.name} 发生碰撞，Cell.strong 均失去 1 点")
+            return False
         self.x = x
         self.y = y
         self.env.write(x, y, self)
