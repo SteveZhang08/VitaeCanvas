@@ -378,7 +378,7 @@ class Cell:
         self.strong = 5     # 细胞结构强度
         self.metabolic_init()
         # 细胞初始化完成
-        self.move(self.x, self.y)           # 移动细胞到初始位置
+        self.env.write(self.x, self.y, self)           # 移动细胞到初始位置
 
     def metabolic_init(self):
         """
@@ -394,10 +394,11 @@ class Cell:
         self.function(self.protein_list)
 
     def __str__(self) -> str:
-        return f"Cell' s Name: {self.name}, Age: {self.age}"
+        return f"{r'{'}Cell' s Name: {self.name}, Age: {self.age}{r'}'}"
 
     def __repr__(self) -> str:
-        return f"Cell' s Name: {self.name}, Age: {self.age}, Energy: {self.energy}"
+        return f"{r'{'}Cell' s Name: {self.name}, Age: {self.age}, Energy: {self.energy}{r'}'}"
+
 
     def normalize_dna(self, dna:DNA) -> DNA:
         """标准化DNA序列"""
@@ -493,9 +494,11 @@ class Cell:
             other_cell.strong -= 1
             env.debug(f"细胞 {self.name} 与 {other_cell.name} 发生碰撞，Cell.strong 均失去 1 点")
             return False
+        self.env.remove_type(self.x, self.y, Cell)
         self.x = x
         self.y = y
         self.env.write(x, y, self)
+        return True
 
     def _color(self):
         """计算细胞RGB颜色"""
@@ -538,9 +541,6 @@ if __name__ == "__main__":
     env1 = env.Environment()
     env1.write(0,1,env.Energy(200))
     cell1 = Cell(env1, 0, 0, dna=DNA("TACCCCCGCACGGACTATACGATGACCTCGACGACGTACTTGACTACGATGTCGTGCTACTGCTCCACTCGCACGTGCTATTTGACTTCGTTCTTGGTCTTCACTCCCCGCTCGGACACTTACCGCAAGGACCACTCCGGCATGTATACGCCCTCGACTCACCACCACACTCACATGCTCACT"))
-    #print(cell1.x, cell1.y)
-    #print(cell1.dna)
-    #print(cell1.rna.split)
     print(cell1.protein_list)
     print(f"细胞{cell1.name}的能量转化率为{cell1.metabolic_rate}")
     print(env1.read(0, 1))

@@ -60,22 +60,33 @@ class Environment:
     """二维环境模拟与协调"""
     def __init__(self, width: int = 100, height: int = 100) -> None:
         ''' 注意：环境坐标范围是从(0,0)到(width,height)，包括边界值'''
+        if type(width) != int or type(height) != int:
+            raise Environment_Error("环境宽度和高度必须为整数！\nEnvironment width and height must be integers!")
+        if (width <= 0 or height <= 0):
+            raise Environment_Error("环境宽度和高度必须大于0！\nEnvironment width and height must be greater than 0!")
         self.width = width
         self.height = height
-        self.env = {(0, 0):[Energy(0)]}
-        self.type_register_table = {Energy:[(0,0)]}
+        self.env = {}   # (0, 0):[Energy(0)]
+        self.type_register_table = {}   # Energy:[(0,0)]
+
+    def in_env(self, x: int, y: int) -> bool:
+        """检查坐标是否在环境内"""
+        return 0 <= x <= self.width and 0 <= y <= self.height
+
 
     def read(self, x: int = 0, y: int = 0) -> list:
         """读取环境信息"""
-        if x < 0 or x > self.width or y < 0 or y > self.height:
+        if not self.in_env(x, y):
             raise Environment_Error(f"[function]read:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         return self.env.get((x, y), [])
 
     def write(self,x: int, y: int, content: any):
         """写入环境信息（相同类型的信息会被覆盖）"""
-        if x < 0 or x > self.width or y < 0 or y > self.height:
+        if not self.in_env(x, y):
             raise Environment_Error(f"[function]write:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         grid = self.read(x, y)
+        if grid == None:
+            grid = []
         # 检查是否已经存在该类型信息，如果存在就删除
         for idx in reversed(range(len(grid))):
             if isinstance(grid[idx], type(content)):
@@ -179,12 +190,29 @@ class Environment:
         :param y: 要删除的元素的y坐标
         :param idx: 要删除的元素的索引
         """
-        if x < 0 or x > self.width or y < 0 or y > self.height:
-            raise Environment_Error(f"[function]delete:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
-        content = self.env[(x, y)][idx]
-        self.env[(x, y)].pop(idx)
+        if not self.in_env(x, y):
+            raise Environment_Error(f"[function]remove:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
+        grid_content = self.read(x, y)
+        if idx >= len(grid_content):
+            raise Environment_Error(f"[function]remove:错误，索引({idx})超出范围！\nError, index ({idx}) out of range!")
+        content = grid_content[idx]
+        grid_content.pop(idx)
         # 删除后需要更新类型表
         self.type_register_table[type(content)].remove((x, y))
+
+    def remove_type(self, x: int, y: int, check_type):
+        """删除环境中的指定类型
+        :param x: 要删除的元素的x坐标
+        :param y: 要删除的元素的y坐标
+        :param check_type: 要删除的类型"""
+        if not self.in_env(x, y):
+            raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
+        grid = self.read(x, y)
+        idx = self.check_type_on_env(grid, check_type)
+        if idx != None:
+            self.delete(x, y, idx)
+        else:
+            raise Environment_Error(f"[function]remove_type:错误，类型({check_type})未找到！\nError, data type {check_type} not found!")
 
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)

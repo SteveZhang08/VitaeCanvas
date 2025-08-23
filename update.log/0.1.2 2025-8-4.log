@@ -12,4 +12,4 @@ remove:
 删除了 vitae_system/env.py/Environment.energy_diffusion 函数
 
 issue:
-None
+Cell 的 move 方法存在问题，移动后原位置仍存在细胞对象
