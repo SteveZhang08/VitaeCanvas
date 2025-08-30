@@ -21,7 +21,7 @@ class SimulationTestCase(unittest.TestCase):
         for cell_id in range(100):
             new_cell = cells.Cell(self.env, cell_id, cell_id, dna=DNA, name=f"cell_{cell_id}")
             self.cell_list.append(new_cell)
-            self.env.write(cell_id, cell_id, cells.Sugar(6,12,6))
+            self.env.write(cell_id, cell_id, cells.SugarList([cells.Sugar(6,12,6)]))
 
     def test_environment_initialization(self):
         """测试环境初始化"""
