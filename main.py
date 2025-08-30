@@ -9,11 +9,12 @@ class SimulationController:
         self.env = env.Environment(100, 100)
         cell_list = []
         cell_list.append(cells.Cell(self.env, 0, 0, dna = DNA, name="Vita"))
-        resource_list = [env.Energy(100), env.O2(200), env.H2O(200), cells.Sugar(6,12,6)]
+        resource_list = [env.Energy(100), env.O2(200), env.H2O(200), cells.SugarList([cells.Sugar(6,12,6)])]
         for resource in resource_list:
             self.env.write(0, 0, resource)
         self.env.write(0,1,env.Energy(200))
-        print(self.env.read(0,0))
+        for i in self.env.read(0,0):
+            print(i)
         print("细胞载入完成")
         print(f"共{len(cell_list)}个细胞")
         for cell in cell_list:

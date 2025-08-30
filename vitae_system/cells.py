@@ -350,6 +350,9 @@ class Sugar:
         env.debug(f"糖{str(self)}的水解产生了{energy_value}的能量和{NADH_value}个NADH")
         return {'energy':env.Energy(energy_value), 'NADH':NADH(NADH_value)}
 
+class SugarList(list):
+    pass
+
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 

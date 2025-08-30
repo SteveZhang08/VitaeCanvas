@@ -77,16 +77,21 @@ class MetabolismSystem:
 
     def absorb_sugar(self) -> Sugar:
         # 从环境中吸收糖类
-        sugar_idx = self.env.check_type_on_env(self.grid_data, Sugar)
-        if sugar_idx == None:
+        SugarList_idx = self.env.check_type_on_env(self.grid_data, SugarList)
+        if SugarList_idx == None:
             self.sugar = None
         else:
-            self.sugar:Sugar = self.grid_data[sugar_idx]
-            # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
-            self.env.delete(self.x,self.y,sugar_idx)
-            self.cell.energy.value -= self.cell.material_exchange_energy
-            self.env_energy.value += self.cell.material_exchange_energy
-            debug(f"细胞{self.cell.name}吸收了{str(self.sugar)}并耗能{self.cell.material_exchange_energy}")
+            sugarlist:SugarList = self.grid_data[SugarList_idx]
+            if len(sugarlist) != 0:
+                import random
+                self.sugar:Sugar = random.choice(sugarlist) # 获取糖类列表中随机一项
+                # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
+                self.env.delete(self.x,self.y,SugarList_idx)
+                self.cell.energy.value -= self.cell.material_exchange_energy
+                self.env_energy.value += self.cell.material_exchange_energy
+                debug(f"细胞{self.cell.name}吸收了{str(self.sugar)}并耗能{self.cell.material_exchange_energy}")
+            else:
+                self.sugar = None
 
     def hydrolysis(self):
         '''

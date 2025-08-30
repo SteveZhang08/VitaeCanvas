@@ -11,7 +11,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 __version__ = "0.1.2"
-__author__ = "SteveZhang08, HLF1633"
+__author__ = "SteveZhang08, HLF1633, TSAVPYN"
 __all__ = ['cells', 'env', 'metabolism']
 __date__ = "2025-8-4"
 time_stamp = 1754320602

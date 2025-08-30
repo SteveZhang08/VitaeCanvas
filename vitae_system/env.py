@@ -6,7 +6,7 @@
 # Kimi  DeepSeek-R1
 DIFFUSION_RATE = 0.1
 DEBUG = True
-WARNING = True
+WARNING = False
 
 def debug(message):
     if DEBUG == True:
