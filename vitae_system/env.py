@@ -214,6 +214,31 @@ class Environment:
         else:
             raise Environment_Error(f"[function]remove_type:错误，类型({check_type})未找到！\nError, data type {check_type} not found!")
 
+    def horizontal_move_the_whole_row(self,y:int, check_type, begin=0, offset=1):
+        """
+        移动整行元素
+        :param y: 要水平移动的行的y坐标
+        :param check_type: 要移动的元素的类型（必须具有move方法）
+        :param begin: 开始移动的位置的x坐标
+        :param offset: 移动的偏移量
+        """
+        if not self.in_env(y, y):
+            raise Environment_Error(f"[function]horizontal_move_the_whole_row:错误，坐标({y}, {y})超出范围！\nError, coordinate ({y}, {y}) out of range!")
+        wait_move_list = []
+        for coordinates in self.env.keys():
+            if coordinates[1] == y and (coordinates[0] - begin)*offset >= 0:
+                wait_move_list.append(coordinates)
+        if offset > 0:
+            wait_move_list.sort(reverse=True)
+        else:
+            wait_move_list.sort()
+        for coordinates in wait_move_list:
+            x, y = coordinates
+            grid_content = self.read(x, y)
+            idx = self.check_type_on_env(grid_content, check_type)
+            if idx != None:
+                grid_content[idx].move(x + offset, y)
+
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)
     energy_1 = Energy(200, diffuse=False)
