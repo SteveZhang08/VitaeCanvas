@@ -1,6 +1,7 @@
 add:
 新增细胞的受体与运动蛋白
 新增 vitae_system/vitae_math.py 以支持生物数学运算
+引入 chou-fasman 算法预测蛋白质结构
 
 repair:
 None
