@@ -5,13 +5,15 @@
 
 if __name__ == "__main__":
     # 当作为主程序直接运行时，绝对导入同级模块
-    from cells import*
-    from env import*
+    from cells import *
+    from env import *
+    from reproduction import *
     import time
 else:
     # 当作为模块被导入时，相对导入库内同级模块
-    from .cells import*
-    from .env import*
+    from .cells import *
+    from .env import *
+    from .reproduction import *
 
 class MetabolismSystem:
     """代谢系统控制器，处理能量转换与物质交换"""
@@ -35,6 +37,7 @@ class MetabolismSystem:
         self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)
         self.NADH:NADH = self.cell.resource['NADH']
         self.grid_data = self.env.read(self.x, self.y)
+        self.new_cell = None
         self.read_env()
         if Sugar in self.cell.abosrbed_substances:
             debug(f"细胞{self.cell.name}开始进行糖的代谢")
@@ -59,6 +62,15 @@ class MetabolismSystem:
         for protein in self.cell.protein_list:
             for func_name in target_functions.intersection(protein.function_dict.keys()):
                 protein.function_dict[func_name](self.cell, call=True)
+
+        # 细胞繁殖
+        if self.cell.energy.value > 200:
+            self.reproduction = Reproduction(self.cell)
+            new_cell = self.reproduction.reproduce()
+            if new_cell != None:
+                debug(f"细胞{self.cell.name}在({self.x},{self.y})繁殖了一个新细胞{new_cell.name}")
+                self.new_cell = new_cell
+
         # 更新环境数据
         self.env.write(self.x, self.y, self.env_energy)
         self.env.write(self.x, self.y, self.O2)
@@ -121,6 +133,9 @@ class MetabolismSystem:
         energy_get:Energy = self.metabolic_energy(Energy(50*o2.value))
         debug(f"细胞{self.cell.name}进行了有氧呼吸，并得到了{energy_get.value}的能量")
         self.cell.energy.value += energy_get.value
+
+    def re_info(self):
+        return self.new_cell
 
 if __name__ == "__main__":
     import random_DNA

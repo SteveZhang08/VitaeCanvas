@@ -59,11 +59,11 @@ class H2O(Energy):
 class Environment:
     """二维环境模拟与协调"""
     def __init__(self, width: int = 100, height: int = 100) -> None:
-        ''' 注意：环境坐标范围是从(0,0)到(width,height)，包括边界值'''
+        ''' 注意：环境坐标范围是从(0,0)到(width,height)，包括边界值
+            如果环境宽度与高度小于0，则环境为无限大
+        '''
         if type(width) != int or type(height) != int:
             raise Environment_Error("环境宽度和高度必须为整数！\nEnvironment width and height must be integers!")
-        if (width <= 0 or height <= 0):
-            raise Environment_Error("环境宽度和高度必须大于0！\nEnvironment width and height must be greater than 0!")
         self.width = width
         self.height = height
         self.env = {}   # (0, 0):[Energy(0)]
@@ -71,8 +71,9 @@ class Environment:
 
     def in_env(self, x: int, y: int) -> bool:
         """检查坐标是否在环境内"""
+        if self.width < 0 or self.height < 0:
+            return True
         return 0 <= x <= self.width and 0 <= y <= self.height
-
 
     def read(self, x: int = 0, y: int = 0) -> list:
         """读取环境信息"""
@@ -238,6 +239,32 @@ class Environment:
             idx = self.check_type_on_env(grid_content, check_type)
             if idx != None:
                 grid_content[idx].move(x + offset, y)
+
+    def vertical_move_the_whole_column(self,x:int, check_type, begin=0, offset=1):
+
+        """
+        移动整列元素
+        :param x: 要垂直移动的列的x坐标
+        :param check_type: 要移动的元素的类型（必须具有move方法）
+        :param begin: 开始移动的位置的y坐标
+        :param offset: 移动的偏移量
+        """
+        if not self.in_env(x, x):
+            raise Environment_Error(f"[function]vertical_move_the_whole_column:错误，坐标({x}, {x})超出范围！\nError, coordinate ({x}, {x}) out of range!")
+        wait_move_list = []
+        for coordinates in self.env.keys():
+            if coordinates[0] == x and (coordinates[1] - begin)*offset >= 0:
+                wait_move_list.append(coordinates)
+        if offset > 0:
+            wait_move_list.sort(reverse=True)
+        else:
+            wait_move_list.sort()
+        for coordinates in wait_move_list:
+            x, y = coordinates
+            grid_content = self.read(x, y)
+            idx = self.check_type_on_env(grid_content, check_type)
+            if idx != None:
+                grid_content[idx].move(x, y + offset)
 
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)

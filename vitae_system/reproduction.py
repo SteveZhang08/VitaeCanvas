@@ -19,8 +19,11 @@ class Reproduction:
         self.cell: Cell = cell
     def reproduce(self):
         new_dna = DNA(self.copy_dna(variation = True))
+        # debug(f"细胞{self.cell.name}在({self.cell.x},{self.cell.y})繁殖了一个新细胞，DNA序列为{new_dna}")
         x, y = self.where_new_cell()
-        new_cell = Cell(new_dna)
+        if x == None or y == None:
+            return None
+        return Cell(self.cell.env, x, y, new_dna, name = str(random.randint(0,100)))
 
     def copy_dna(self, variation = False):
         new_dna = list(str(self.cell.dna))
@@ -40,7 +43,12 @@ class Reproduction:
                     new_dna.insert(random.randint(0, end_idx), random.choice("ACGT"))
         return str(new_dna)
 
+    '''
     def where_new_cell(self):
+        return self.cell.x + random.randint(-1, 1), self.cell.y + random.randint(-1, 1)
+    '''
+    def where_new_cell(self):
+        x, y = None, None
         up_x, up_y =  self.cell.x, self.cell.y - 1
         down_x, down_y = self.cell.x, self.cell.y + 1
         left_x, left_y = self.cell.x - 1, self.cell.y
@@ -92,10 +100,21 @@ class Reproduction:
                 if cell_idx != False:
                     x_y_list.append(x_y)
                     cell_strong_list.append(direction[cell_idx].strong)
+
+            if len(cell_strong_list) == 0:
+                choice = random.randint(0, 1)
+                if choice == 0:
+                    offset = random.choice([-1, 1])
+                    self.cell.env.horizontal_move_the_whole_row(self.cell.y, Cell, self.cell.x, offset)
+                    return self.cell.x + offset, self.cell.y
+                else:
+                    offset = random.choice([-1, 1])
+                    self.cell.env.vertical_move_the_whole_column(self.cell.x, Cell, self.cell.y, offset)
+                    return self.cell.x, self.cell.y + offset
+
             weak_cell = cell_strong_list[0]
             for x_y, cell_strong in zip(x_y_list, cell_strong_list):
                 if cell_strong < weak_cell:
                     weak_cell = cell_strong
                     x, y = x_y
-
         return x, y

@@ -262,13 +262,13 @@ class Protein:
             ('right', (1, 0), 'env_energy_right')]:
             try:
                 # 直接读取并解包有效结果
-                env.debug(f"细胞{cell.name}的{direction}方向环境坐标为({cell.x + dx},{cell.y + dy})")
+                # env.debug(f"细胞{cell.name}的{direction}方向环境坐标为({cell.x + dx},{cell.y + dy})")
                 if grid_content := cell.env.read(cell.x + dx, cell.y + dy):
-                    env.debug(f"数据为{grid_content}")
+                    # env.debug(f"数据为{grid_content}")
                     idx = cell.env.check_type_on_env(grid_content, env.Energy)
                     if idx != None:
                         cell.info[key] = grid_content[idx].value
-                        env.debug(f"细胞{cell.name}的{direction}方向环境能量值为{cell.info[key]}")
+                        # env.debug(f"细胞{cell.name}的{direction}方向环境能量值为{cell.info[key]}")
             except Exception as e:
                 env.warning(f"方向 {direction} 读取失败: {e}")
 
@@ -356,7 +356,6 @@ class SugarList(list):
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 
-    MAX_GENE_LENGTH = 300 # DNA的最大有效长度
     MAX_METABOLIC = 0.8  # 最大能量转化率
     MIN_METABOLIC = 0.1  # 最小能量转化率
 
@@ -372,7 +371,8 @@ class Cell:
         self.age = 0
         self.x = x
         self.y = y
-        self.dna = self.normalize_dna(dna)
+        self.dna = dna
+        #env.debug(f"细胞{self.name}的DNA序列为{self.dna}")
         self.rna = self.DNA_translate(dna)
         self.protein_list:List[Protein] = self.ribosome(self.rna)        
         self.info = {}
@@ -401,15 +401,6 @@ class Cell:
 
     def __repr__(self) -> str:
         return f"{r'{'}Cell' s Name: {self.name}, Age: {self.age}, Energy: {self.energy}{r'}'}"
-
-
-    def normalize_dna(self, dna:DNA) -> DNA:
-        """标准化DNA序列"""
-        # 用T补足长度并截取有效长度
-        if not isinstance(dna, DNA):    # 检查传入的是否是 DNA
-            raise CellError(f"Provided DNA is invalid. Supplied DNA type is {type(dna)}, expected type is DNA. \n传入的DNA不合法，传入的DNA类型为{type(dna)}，期待类型为 DNA")
-        effective_dna = str((dna + DNA('T' * self.MAX_GENE_LENGTH)))[:self.MAX_GENE_LENGTH]
-        return DNA(effective_dna.upper())
 
     def DNA_translate(self, dna:DNA) -> RNA:
         """转录 DNA 为 RNA"""
@@ -475,6 +466,9 @@ class Cell:
         metabolic = 0
         for i in protein_list:
             metabolic += i.metabolic
+        if len(protein_list) == 0:
+            raise CellError(f"Cell {self.name} has no protein.\n细胞 {self.name} 没有蛋白质")
+
         return round(metabolic/len(protein_list), 2)
 
     def function(self, protein_list:List[Protein]):
@@ -485,7 +479,7 @@ class Cell:
 
     def move(self, x: int, y: int):
         """移动细胞至指定坐标"""
-        if not (0 <= x < self.env.width and 0 <= y < self.env.height):
+        if not self.env.in_env(x, y):
             env.debug(f"Cell {self.name} tried to move out of bounds.\n细胞 {self.name} 试图冲击边界")
             self.strong -= 1
             return False
