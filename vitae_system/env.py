@@ -46,6 +46,10 @@ class Energy:
             return self.value == other.value and self.diffuse == other.diffuse
         return NotImplemented
 
+    def copy(self):
+        """返回 Energy 对象的副本"""
+        return Energy(self.value, self.diffuse)
+
 class O2(Energy):
     def __init__(self, value, diffuse=True):
         super().__init__(value, diffuse)
@@ -118,7 +122,7 @@ class Environment:
 
     def check_type_on_env(self, layer:list, check_type):
         """在网格中指定类型查找
-        :param layer: 要查找的环境网格列表
+        :param layer: 要查找的环境网格
         :param check_type: 要查找的类型
         return：所在位置的索引；
                None：不存在该类型"""
@@ -264,6 +268,41 @@ class Environment:
             grid_content = self.read(x, y)
             idx = self.check_type_on_env(grid_content, check_type)
             if idx != None:
+                grid_content[idx].move(x, y + offset)
+
+    def move_element(self, x, y, check_type,mode = 'x',offset=1):
+        """
+        移动单个元素
+        :param x: 要移动的元素的x坐标
+        :param y: 要移动的元素的y坐标
+        :param check_type: 要移动的元素的类型（必须具有move方法）
+        :param mode: 移动模式，'x'表示水平移动，'y'表示垂直移动
+        """
+        if not self.in_env(x, y):
+            raise Environment_Error(f"[function]move_element:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
+        move_list = []
+        while True:
+            # 寻找最后需要被移动的元素
+            grid_content = self.read(x, y)
+            idx = self.check_type_on_env(grid_content, check_type)
+            if idx == None:
+                move_list.reverse() # 将列表倒序，以从最边缘的元素开始
+                break
+            move_list.append((x, y, idx))
+            if mode == 'x':
+                x += offset
+            elif mode == 'y':
+                y += offset
+        # 开始移动
+        if move_list == []:
+            warning(f"[function]move_element:警告，元素({check_type})未找到！没有元素被移动\nWarning, data type {check_type} not found! Any element won't be moved")
+            return
+        for coordinates in move_list:
+            x, y, idx = coordinates
+            grid_content = self.read(x, y)
+            if mode == 'x':
+                grid_content[idx].move(x + offset, y)
+            elif mode == 'y':
                 grid_content[idx].move(x, y + offset)
 
 if __name__ == "__main__":

@@ -28,23 +28,32 @@ class MetabolismSystem:
             - 修改Cell所在坐标的Energy的值
             - 将cell.age增加 1
         """
+        if type(cell) != Cell:
+            raise ValueError(f"[function]MetabolismSystem.__init__: 参数 cell 必须是 {Cell} 类型，但我们得到了 {type(cell)} ？\n cell must be a Cell instance, but we got {type(cell)} ?")
+        if type(env) != Environment:
+            raise ValueError(f"[function]MetabolismSystem.__init__: 参数 env 必须是 {Environment} 类型，但我们得到了 {type(env)} ？\n env must be an Environment instance, but we got {type(env)} ?")
+        
         self.x = cell.x
         self.y = cell.y
         self.env:Environment = env
         self.cell:Cell = cell
+        if self.cell.dead:  # 如果细胞死亡
+            self.vital_signs = 0
+            return
+        self.vital_signs = 1
         self.cell.metabolic_init()
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
-        self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)
+        self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)         # 计算有氧呼吸酶增益
         self.NADH:NADH = self.cell.resource['NADH']
         self.grid_data = self.env.read(self.x, self.y)
         self.new_cell = None
         self.read_env()
-        if Sugar in self.cell.abosrbed_substances:
+        if Sugar in self.cell.absorbed_substances:
             debug(f"细胞{self.cell.name}开始进行糖的代谢")
             self.absorb_sugar()
             if self.sugar != None:
                 self.hydrolysis()
-        if O2 in self.cell.abosrbed_substances:
+        if O2 in self.cell.absorbed_substances:
             nadh = self.NADH
             allow_nadh = NADH(max(nadh.value * self.aerobic_respiration_enzymes, 1))
             need_o2 = O2(allow_nadh.value / 4)
@@ -64,7 +73,7 @@ class MetabolismSystem:
                 protein.function_dict[func_name](self.cell, call=True)
 
         # 细胞繁殖
-        if self.cell.energy.value > 200:
+        if self.cell.energy.value > 215:
             self.reproduction = Reproduction(self.cell)
             new_cell = self.reproduction.reproduce()
             if new_cell != None:
@@ -76,13 +85,21 @@ class MetabolismSystem:
         self.env.write(self.x, self.y, self.O2)
         self.env.write(self.x, self.y, self.H2O)
 
+        if self.cell.energy.value < 0:
+            self.cell.lysis()
+            self.vital_signs = 0
+            debug(f"细胞{self.cell.name}在({self.x},{self.y})死亡")
+
     def read_env(self):
+        '''
+        读取环境中的能量、氧气、水
+        '''
         def read_type(_type):
             idx = self.env.check_type_on_env(self.grid_data, _type)
             if idx != None:
                 return self.grid_data[idx]
             else:
-                return _type(0)
+                return _type(0) # 返回这个项目的空值
         self.env_energy:Energy = read_type(Energy)
         self.O2:O2 = read_type(O2)
         self.H2O:H2O = read_type(H2O)
@@ -135,7 +152,7 @@ class MetabolismSystem:
         self.cell.energy.value += energy_get.value
 
     def re_info(self):
-        return self.new_cell
+        return {'new':self.new_cell, 'Vital_Signs':self.vital_signs}
 
 if __name__ == "__main__":
     import random_DNA

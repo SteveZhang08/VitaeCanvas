@@ -68,6 +68,12 @@ class DNA:
         """返回 DNA 序列的长度"""
         return len(self.sequence)
 
+    def copy(self):
+        """返回 DNA 对象的副本"""
+        return DNA(self.sequence)
+
+DEFAULT_DNA = DNA('TACCCCCGCACGGACTATACGATGACCTCGACGACGTACTTGACTACGATGTCGTGCTACTGCTCCACTCGCACGTGCTATTTGACTTCGTTCTTGGTCTTCACTCCCCGCTCGGACACTTACCGCAAGGACCACTCCGGCATGTATACGCCCTCGACTCACCACCACACTCACATGCTCACT')
+
 class RNA:
     """RNA对象，包含碱基 AUCG"""
 
@@ -353,13 +359,19 @@ class Sugar:
 class SugarList(list):
     pass
 
+class ProteinList(list):
+    pass
+
+class DNAList(list):
+    pass
+
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
 
     MAX_METABOLIC = 0.8  # 最大能量转化率
     MIN_METABOLIC = 0.1  # 最小能量转化率
 
-    def __init__(self, env1:env.Environment,x:int, y:int, dna:DNA = DNA("ATCG"), name = None) -> None:
+    def __init__(self, env1:env.Environment,x:int, y:int, dna:DNA = DEFAULT_DNA, name = None) -> None:
         """
         初始化细胞实例
         :param x: X坐标
@@ -377,8 +389,10 @@ class Cell:
         self.protein_list:List[Protein] = self.ribosome(self.rna)        
         self.info = {}
         self.env = env1
+        self.grid = self.env.read(self.x, self.y)
         self.color = self._color()
         self.strong = 5     # 细胞结构强度
+        self.dead = False
         self.metabolic_init()
         # 细胞初始化完成
         self.env.write(self.x, self.y, self)           # 移动细胞到初始位置
@@ -392,7 +406,7 @@ class Cell:
         self.variation_rate = 0.1    # 变异概率
         self.material_exchange_energy = 5   # 物质交换耗能
         self.aerobic_respiration_enzymes = 0.0   # 有氧呼吸酶增益
-        self.abosrbed_substances = [Sugar, env.O2]           # 细胞允许吸收的物质列表
+        self.absorbed_substances = [Sugar, env.O2]           # 细胞允许吸收的物质列表
         self.resource = {'NADH':NADH(10)}
         self.function(self.protein_list)
 
@@ -497,6 +511,33 @@ class Cell:
         self.env.write(x, y, self)
         return True
 
+    def lysis(self):
+        """细胞裂解"""
+        self.env.remove_type(self.x, self.y, Cell)  # 从环境中删除自己
+        # 将蛋白质返回环境
+        ProteinList_idx = self.env.check_type_on_env(self.grid, ProteinList)
+        if ProteinList_idx != None:
+            self.grid[ProteinList_idx].extend(self.protein_list.copy())
+        else:
+            # 没有蛋白质列表时，创建一个新的
+            self.env.write(self.x, self.y, ProteinList(self.protein_list.copy()))
+
+        # 将基因返回环境
+        DNAList_idx = self.env.check_type_on_env(self.grid, DNAList)
+        if DNAList_idx != None:
+            self.grid[DNAList_idx].append(self.dna.copy())
+        else:
+            # 如果环境中没有基因列表，创建一个新的
+            self.env.write(self.x, self.y, DNAList([self.dna.copy()]))
+        # 将能量返回环境
+        energy_idx = self.env.check_type_on_env(self.grid, env.Energy)
+        if energy_idx != None:
+            self.grid[energy_idx].value += self.energy.value
+        else:
+            self.env.write(self.x, self.y, self.energy.copy())
+
+        self.dead = True    # 细胞死亡
+
     def _color(self):
         """计算细胞RGB颜色"""
         sequence = ""
@@ -537,7 +578,7 @@ class Cell:
 if __name__ == "__main__":
     env1 = env.Environment()
     env1.write(0,1,env.Energy(200))
-    cell1 = Cell(env1, 0, 0, dna=DNA("TACCCCCGCACGGACTATACGATGACCTCGACGACGTACTTGACTACGATGTCGTGCTACTGCTCCACTCGCACGTGCTATTTGACTTCGTTCTTGGTCTTCACTCCCCGCTCGGACACTTACCGCAAGGACCACTCCGGCATGTATACGCCCTCGACTCACCACCACACTCACATGCTCACT"))
+    cell1 = Cell(env1, 0, 0)
     print(cell1.protein_list)
     print(f"细胞{cell1.name}的能量转化率为{cell1.metabolic_rate}")
     print(env1.read(0, 1))

@@ -105,11 +105,13 @@ class Reproduction:
                 choice = random.randint(0, 1)
                 if choice == 0:
                     offset = random.choice([-1, 1])
-                    self.cell.env.horizontal_move_the_whole_row(self.cell.y, Cell, self.cell.x, offset)
+                    #self.cell.env.horizontal_move_the_whole_row(self.cell.y, Cell, self.cell.x, offset)
+                    self.cell.env.move_element(self.cell.x, self.cell.y, Cell, mode='x', offset=offset)
                     return self.cell.x + offset, self.cell.y
                 else:
                     offset = random.choice([-1, 1])
-                    self.cell.env.vertical_move_the_whole_column(self.cell.x, Cell, self.cell.y, offset)
+                    #self.cell.env.vertical_move_the_whole_column(self.cell.x, Cell, self.cell.y, offset)
+                    self.cell.env.move_element(self.cell.x, self.cell.y, Cell, mode='y', offset=offset)
                     return self.cell.x, self.cell.y + offset
 
             weak_cell = cell_strong_list[0]

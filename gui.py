@@ -152,7 +152,7 @@ while running:
             )
     
     # 显示信息
-    font = pygame.font.SysFont(None, 24)
+    font = pygame.font.Font("Font/SourceHanSansSC-Regular.otf", 24)
     info_text = f"细胞数量: {len(simulation.cell_list)} | 网格大小: {CELL_SIZE}px"
     text_surface = font.render(info_text, True, (200, 200, 200))
     screen.blit(text_surface, (10, 10))
