@@ -133,7 +133,8 @@ class MetabolismSystem:
         debug(f"细胞{self.cell.name}进行了{self.sugar}的水解，并从中吸收了{energy_get.value}的能量")
 
     def metabolic_energy(self, energy:Energy) -> Energy:
-        # 计算细胞能量转换
+        if type(energy) != Energy:
+            raise ValueError(f"[function]MetabolismSystem.__init__: 参数 energy 必须是 {Energy} 类型，但我们得到了 {type(energy)} ？\n energy must be a Energy instance, but we got {type(energy)} ?")
         # 计算吸收能量
         absorb = energy.value * self.metabolic_rate
         # 计算输出能量
@@ -142,6 +143,10 @@ class MetabolismSystem:
         return Energy(absorb, diffuse=False)
 
     def aerobic_respiration(self, o2:O2, nadh:NADH):
+        if type(o2) != O2:
+            raise ValueError(f"[function]MetabolismSystem.__init__: 参数 o2 必须是 {O2} 类型，但我们得到了 {type(o2)} ？\n o2 must be a O2 instance, but we got {type(o2)} ?")
+        if type(nadh) != NADH:
+            raise ValueError(f"[function]MetabolismSystem.__init__: 参数 nadh 必须是 {NADH} 类型，但我们得到了 {type(nadh)} ？\n nadh must be a NADH instance, but we got {type(nadh)} ?")
         # 进行有氧呼吸
         # 1*O2 + 4*NADH -> 50*Energy + 2*H2O
         self.O2.value -= o2.value

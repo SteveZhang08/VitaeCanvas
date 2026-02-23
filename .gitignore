@@ -1,3 +1,4 @@
 # 忽略所有 __pycache__ 文件夹
 __pycache__/
 ./vitae_system/__pycache__/
+./vscode
