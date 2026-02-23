@@ -2,6 +2,7 @@ add:
 新增细胞的受体与运动蛋白
 新增 vitae_system/vitae_math.py 以支持生物数学运算
 引入 chou-fasman 算法预测蛋白质结构
+修复了来自 0.1.2 的 issue ：Cell 的 move 方法存在问题，移动后原位置仍存在细胞对象
 
 repair:
 None

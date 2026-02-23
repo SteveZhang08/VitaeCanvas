@@ -92,13 +92,9 @@ class Environment:
         grid = self.read(x, y)
         if grid == None:
             grid = []
-        # 检查是否已经存在该类型信息，如果存在就删除
-        for idx in reversed(range(len(grid))):
-            if isinstance(grid[idx], type(content)):
-                grid.pop(idx)
         grid.append(content)
         self.env[(x, y)] = grid     # 因为惰性加载，这一步是必须的，请不要删除
-        # 将类型注册到类型表中
+        # 将类型注册到注册表中
         type_grid = self.type_register_table.get(type(content), [])
         if not (x, y) in type_grid:
             type_grid.append((x, y))
@@ -120,15 +116,27 @@ class Environment:
         else:
             return result
 
-    def check_type_on_env(self, layer:list, check_type):
+    def check_type_on_env(self, layer:list, check_type, mode="none") -> tuple:
         """在网格中指定类型查找
         :param layer: 要查找的环境网格
         :param check_type: 要查找的类型
-        return：所在位置的索引；
+        :param mode: 查找模式，"none"：返回第一个找到的索引；"all"：返回所有找到的索引
+        return：包含所有该类型所在位置的索引的元组；
                None：不存在该类型"""
-        for idx, item in enumerate(layer):
-            if isinstance(item, check_type):
-                return idx
+        if mode == "none":
+            for idx, item in enumerate(layer):
+                if isinstance(item, check_type):
+                    return (idx)
+        elif mode == "all":
+            result = []
+            for idx, item in enumerate(layer):
+                if isinstance(item, check_type):
+                    result.append(idx)
+            return tuple(result)
+
+        else:
+            raise ValueError(f"[function]check_type_on_env:错误，模式{mode}不存在！\nError, mode {mode} not found!")
+
         warning(f"[function]check_type_on_env:警告，类型{check_type}未找到！\nWarning, data type {check_type} not found!")
         return None
 
@@ -202,8 +210,9 @@ class Environment:
             raise Environment_Error(f"[function]remove:错误，索引({idx})超出范围！\nError, index ({idx}) out of range!")
         content = grid_content[idx]
         grid_content.pop(idx)
-        # 删除后需要更新类型表
-        self.type_register_table[type(content)].remove((x, y))
+        # 如果该位置已没有该元素，将其从注册表中移除
+        if self.check_type_on_env(grid_content, type(content)) == None:
+            self.type_register_table[type(content)].remove((x, y))
 
     def remove_type(self, x: int, y: int, check_type):
         """删除环境中的指定类型
@@ -213,9 +222,12 @@ class Environment:
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         grid = self.read(x, y)
-        idx = self.check_type_on_env(grid, check_type)
+        if grid == None:
+            raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})上没有元素！\nError, coordinate ({x}, {y}) is empty!")
+        idx = self.check_type_on_env(grid, check_type, mode="all")
         if idx != None:
-            self.delete(x, y, idx)
+            for i in sorted(idx, reverse=True):
+                self.delete(x, y, i)
         else:
             raise Environment_Error(f"[function]remove_type:错误，类型({check_type})未找到！\nError, data type {check_type} not found!")
 

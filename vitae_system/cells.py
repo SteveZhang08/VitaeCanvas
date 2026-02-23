@@ -328,7 +328,7 @@ class NADH(env.Energy):
         self.name = "NADH"
 
 class Sugar:
-    def __init__(self, C:int=6, H:int=12, O:int=6) -> None:
+    def __init__(self, C:int=6, H:int=12, O:int=6, type:str="Monosaccharide") -> None:
         """
         糖的分子式
         :param C: 糖的碳原子数量
@@ -338,6 +338,7 @@ class Sugar:
         self.C = C
         self.H = H
         self.O = O
+        self.type = type
 
     def __str__(self):
         """返回 Sugar 的字符串表示"""
