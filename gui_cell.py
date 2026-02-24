@@ -199,7 +199,7 @@ class CellGUI:
             self.color_display.config(bg='white')
         
         # 更新环境信息
-        env_info = self.env1.read(1, 1)
+        env_info = self.env1.read((1, 1))
         self.env_label.config(text=f"环境信息: {env_info}")
     
     def reset_stats(self):

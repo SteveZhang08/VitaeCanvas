@@ -390,13 +390,13 @@ class Cell:
         self.protein_list:List[Protein] = self.ribosome(self.rna)        
         self.info = {}
         self.env = env1
-        self.grid = self.env.read(self.x, self.y)
+        self.grid = self.env.read((self.x, self.y))
         self.color = self._color()
         self.strong = 5     # 细胞结构强度
         self.dead = False
         self.metabolic_init()
         # 细胞初始化完成
-        self.env.write(self.x, self.y, self)           # 移动细胞到初始位置
+        self.env.write((self.x, self.y), self)           # 移动细胞到初始位置
 
     def metabolic_init(self):
         """

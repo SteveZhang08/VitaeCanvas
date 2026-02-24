@@ -56,25 +56,25 @@ class Reproduction:
 
         # 检查是否超出环境范围
         if self.cell.env.in_env(up_x, up_y):
-            up_grid = self.cell.env.read(up_x, up_y)
+            up_grid = self.cell.env.read((up_x, up_y))
             up_idx = self.cell.env.check_type_on_env(up_grid, Cell)
         else:
             up_grid = []
             up_idx = False
         if self.cell.env.in_env(down_x, down_y):
-            down_grid = self.cell.env.read(down_x, down_y)
+            down_grid = self.cell.env.read((down_x, down_y))
             down_idx = self.cell.env.check_type_on_env(down_grid, Cell)
         else:
             down_grid = []
             down_idx = False
         if self.cell.env.in_env(left_x, left_y):
-            left_grid = self.cell.env.read(left_x, left_y)
+            left_grid = self.cell.env.read((left_x, left_y))
             left_idx = self.cell.env.check_type_on_env(left_grid, Cell)
         else:
             left_grid = []
             left_idx = False
         if self.cell.env.in_env(right_x, right_y):
-            right_grid = self.cell.env.read(right_x, right_y)
+            right_grid = self.cell.env.read((right_x, right_y))
             right_idx = self.cell.env.check_type_on_env(right_grid, Cell)
         else:
             right_grid = []

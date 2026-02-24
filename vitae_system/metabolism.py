@@ -45,7 +45,7 @@ class MetabolismSystem:
         self.metabolic_rate = min(self.cell.metabolic_rate*(1+self.cell.efficiency_increase),1)   # 计算细胞能量转化率（算上增幅）
         self.aerobic_respiration_enzymes = min(self.cell.aerobic_respiration_enzymes, 0.8)         # 计算有氧呼吸酶增益
         self.NADH:NADH = self.cell.resource['NADH']
-        self.grid_data = self.env.read(self.x, self.y)
+        self.grid_data = self.env.read((self.x, self.y))
         self.new_cell = None
         self.read_env()
         if Sugar in self.cell.absorbed_substances:
@@ -81,9 +81,9 @@ class MetabolismSystem:
                 self.new_cell = new_cell
 
         # 更新环境数据
-        self.env.write(self.x, self.y, self.env_energy)
-        self.env.write(self.x, self.y, self.O2)
-        self.env.write(self.x, self.y, self.H2O)
+        self.env.write((self.x, self.y), self.env_energy)
+        self.env.write((self.x, self.y), self.O2)
+        self.env.write((self.x, self.y), self.H2O)
 
         if self.cell.energy.value < 0:
             self.cell.lysis()
@@ -115,7 +115,7 @@ class MetabolismSystem:
                 import random
                 self.sugar:Sugar = random.choice(sugarlist) # 获取糖类列表中随机一项
                 # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
-                self.env.delete(self.x,self.y,SugarList_idx)
+                self.env.delete((self.x,self.y),SugarList_idx)
                 self.cell.energy.value -= self.cell.material_exchange_energy
                 self.env_energy.value += self.cell.material_exchange_energy
                 debug(f"细胞{self.cell.name}吸收了{str(self.sugar)}并耗能{self.cell.material_exchange_energy}")

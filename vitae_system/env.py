@@ -73,23 +73,25 @@ class Environment:
         self.env = {}   # (0, 0):[Energy(0)]
         self.type_register_table = {}   # Energy:[(0,0)]
 
-    def in_env(self, x: int, y: int) -> bool:
+    def in_env(self, x, y) -> bool:
         """检查坐标是否在环境内"""
         if self.width < 0 or self.height < 0:
             return True
         return 0 <= x <= self.width and 0 <= y <= self.height
 
-    def read(self, x: int = 0, y: int = 0) -> list:
+    def read(self, coordinate) -> list:
         """读取环境信息"""
+        x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]read:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         return self.env.get((x, y), [])
 
-    def write(self,x: int, y: int, content: any):
+    def write(self, coordinate, content: any):
         """写入环境信息（相同类型的信息会被覆盖）"""
+        x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]write:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
-        grid = self.read(x, y)
+        grid = self.read((x, y))
         if grid == None:
             grid = []
         grid.append(content)
@@ -107,7 +109,7 @@ class Environment:
         result = []
         type_grid = self.type_register_table.get(check_type, [])
         for env_coordinates in type_grid:
-            idx = self.check_type_on_env(self.read(env_coordinates[0], env_coordinates[1]), check_type)
+            idx = self.check_type_on_env(self.read(env_coordinates), check_type)
             if idx != None:
                 result.append(env_coordinates + (idx,))
         if result == []:
@@ -121,6 +123,7 @@ class Environment:
         :param layer: 要查找的环境网格
         :param check_type: 要查找的类型
         :param mode: 查找模式，"none"：返回第一个找到的索引；"all"：返回所有找到的索引
+
         return：包含所有该类型所在位置的索引的元组；
                None：不存在该类型"""
         if mode == "none":
@@ -146,7 +149,8 @@ class Environment:
         :param diffusion_type: 资源类型
         '''
         def add_resources(x, y, add_type, value):
-            layer = self.read(x, y)
+            layer = self.read((x, y))
+
             z = self.check_type_on_env(layer, add_type)
             if z != None:
                 layer[z].value += value
@@ -160,7 +164,8 @@ class Environment:
             return None
         for location in location_list:
             x, y, z = location
-            wait_to_diffusion_type = self.read(x, y)[z]
+            wait_to_diffusion_type = self.read((x, y))[z]
+
             if wait_to_diffusion_type.value <= 0.1 or wait_to_diffusion_type.diffuse == False:
                 # 值小于 0.1 的资源已没有扩散必要，防止整个环境被充满极低的资源值造成性能浪费
                 continue
@@ -196,16 +201,16 @@ class Environment:
         self.resources_diffusion_type(H2O)
         self.resources_diffusion_type(O2)
 
-    def delete(self, x: int, y: int, idx: int):
+    def delete(self, coordinate, idx: int):
         """
         删除环境中的元素
-        :param x: 要删除的元素的x坐标
-        :param y: 要删除的元素的y坐标
+        :param coordinate: 要删除的元素的坐标
         :param idx: 要删除的元素的索引
         """
+        x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]remove:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
-        grid_content = self.read(x, y)
+        grid_content = self.read((x, y))
         if idx >= len(grid_content):
             raise Environment_Error(f"[function]remove:错误，索引({idx})超出范围！\nError, index ({idx}) out of range!")
         content = grid_content[idx]
@@ -214,11 +219,11 @@ class Environment:
         if self.check_type_on_env(grid_content, type(content)) == None:
             self.type_register_table[type(content)].remove((x, y))
 
-    def remove_type(self, x: int, y: int, check_type):
+    def remove_type(self, coordinate, check_type):
         """删除环境中的指定类型
-        :param x: 要删除的元素的x坐标
-        :param y: 要删除的元素的y坐标
+        :param coordinate: 要删除的元素的坐标
         :param check_type: 要删除的类型"""
+        x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         grid = self.read(x, y)
@@ -282,14 +287,14 @@ class Environment:
             if idx != None:
                 grid_content[idx].move(x, y + offset)
 
-    def move_element(self, x, y, check_type,mode = 'x',offset=1):
+    def move_element(self, coordinate, check_type,mode = 'x',offset=1):
         """
         移动单个元素
-        :param x: 要移动的元素的x坐标
-        :param y: 要移动的元素的y坐标
+        :param coordinate: 要移动的元素的坐标
         :param check_type: 要移动的元素的类型（必须具有move方法）
         :param mode: 移动模式，'x'表示水平移动，'y'表示垂直移动
         """
+        x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]move_element:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
         move_list = []
