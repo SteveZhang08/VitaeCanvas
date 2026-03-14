@@ -235,7 +235,25 @@ class Environment:
                 self.delete(x, y, i)
         else:
             raise Environment_Error(f"[function]remove_type:错误，类型({check_type})未找到！\nError, data type {check_type} not found!")
-
+    
+    def remove_object(self, coordinate, object):
+        """删除环境中的指定对象
+        :param coordinate: 要删除的元素的坐标
+        :param object: 要删除的对象"""
+        x, y = coordinate
+        if not self.in_env(x, y):
+            raise Environment_Error(f"[function]remove_object:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
+        grid: list = self.read(x, y)
+        if grid == None:
+            raise Environment_Error(f"[function]remove_object:错误，坐标({x}, {y})上没有元素！\nError, coordinate ({x}, {y}) is empty!")
+        if object in grid:
+            grid.remove(object)
+            # 如果该位置已没有该元素，将其从注册表中移除
+            if self.check_type_on_env(grid, type(object)) == None:
+                self.type_register_table[type(object)].remove((x, y))
+        else:
+            raise Environment_Error(f"[function]remove_object:错误，对象({object})未找到！\nError, object {object} not found!")
+    
     def horizontal_move_the_whole_row(self,y:int, check_type, begin=0, offset=1):
         """
         移动整行元素

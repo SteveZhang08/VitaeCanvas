@@ -514,7 +514,7 @@ class Cell:
 
     def lysis(self):
         """细胞裂解"""
-        self.env.remove_type(self.x, self.y, Cell)  # 从环境中删除自己
+        self.env.remove_object(self.x, self.y, self)  # 从环境中删除自己
         # 将蛋白质返回环境
         ProteinList_idx = self.env.check_type_on_env(self.grid, ProteinList)
         if ProteinList_idx != None:
