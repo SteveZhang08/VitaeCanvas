@@ -106,20 +106,17 @@ class MetabolismSystem:
 
     def absorb_sugar(self) -> Sugar:
         # 从环境中吸收糖类
-        SugarList_idx = self.env.check_type_on_env(self.grid_data, SugarList)
-        if SugarList_idx == None:
-            self.sugar = None
-        else:
-            sugarlist:SugarList = self.grid_data[SugarList_idx]
-            if len(sugarlist) != 0:
+        sugar_tuple = self.env.check_type_on_env(self.grid_data, Sugar, mode="all")
+        if sugar_tuple != None and sugar_tuple != ():
                 import random
-                self.sugar:Sugar = random.choice(sugarlist) # 获取糖类列表中随机一项
+                sugar_idx = random.choice(sugar_tuple) # 获取糖类列表中随机一项
+                self.sugar = self.grid_data[sugar_idx]
                 # 如果吸收到糖类，删除环境中的糖类，消耗细胞物质交换能量，耗能返还环境
-                self.env.delete((self.x,self.y),SugarList_idx)
+                self.env.delete((self.x,self.y),sugar_idx)
                 self.cell.energy.value -= self.cell.material_exchange_energy
                 self.env_energy.value += self.cell.material_exchange_energy
                 debug(f"细胞{self.cell.name}吸收了{str(self.sugar)}并耗能{self.cell.material_exchange_energy}")
-            else:
+        else:
                 self.sugar = None
 
     def hydrolysis(self):
@@ -162,12 +159,12 @@ class MetabolismSystem:
 if __name__ == "__main__":
     import random_DNA
     env1 = env.Environment()
-    env1.write(0,0,Energy(114))
+    env1.write((0,0), Energy(114))
+
     cell1 = Cell(env1, 0, 0, dna=DNA(random_DNA.generate_dna(9)))
     while True:
         print(f'细胞能量转化率：{cell1.metabolic_rate}')
         MetabolismSystem(cell1, env1)
-        print(cell1.energy)
-        print(f'细胞当前坐标能量值：{env1.read(cell1.x, cell1.y)[env1.check_type_on_env(env1.read(cell1.x, cell1.y), Energy)]}')
+        print(f'细胞当前坐标能量值：{env1.read((cell1.x, cell1.y))[env1.check_type_on_env(env1.read((cell1.x, cell1.y)), Energy)]}')
         env1.resources_diffusion()
         time.sleep(1)

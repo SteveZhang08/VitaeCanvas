@@ -269,7 +269,7 @@ class Protein:
             try:
                 # 直接读取并解包有效结果
                 # env.debug(f"细胞{cell.name}的{direction}方向环境坐标为({cell.x + dx},{cell.y + dy})")
-                if grid_content := cell.env.read(cell.x + dx, cell.y + dy):
+                if grid_content := cell.env.read((cell.x + dx, cell.y + dy)):
                     # env.debug(f"数据为{grid_content}")
                     idx = cell.env.check_type_on_env(grid_content, env.Energy)
                     if idx != None:
@@ -357,14 +357,6 @@ class Sugar:
         env.debug(f"糖{str(self)}的水解产生了{energy_value}的能量和{NADH_value}个NADH")
         return {'energy':env.Energy(energy_value), 'NADH':NADH(NADH_value)}
 
-class SugarList(list):
-    pass
-
-class ProteinList(list):
-    pass
-
-class DNAList(list):
-    pass
 
 class Cell:
     """细胞实体类，包含遗传信息与代谢属性"""
@@ -498,7 +490,8 @@ class Cell:
             env.debug(f"Cell {self.name} tried to move out of bounds.\n细胞 {self.name} 试图冲击边界")
             self.strong -= 1
             return False
-        grid_data = self.env.read(x, y)
+        grid_data = self.env.read((x, y))
+
         idx = self.env.check_type_on_env(grid_data, Cell)
         if idx != None: # 如果新网格中存在细胞
             self.strong -= 1
@@ -506,36 +499,26 @@ class Cell:
             other_cell.strong -= 1
             env.debug(f"细胞 {self.name} 与 {other_cell.name} 发生碰撞，Cell.strong 均失去 1 点")
             return False
-        self.env.remove_type(self.x, self.y, Cell)
+        self.env.remove_type((self.x, self.y), Cell)
         self.x = x
         self.y = y
-        self.env.write(x, y, self)
+        self.env.write((x, y), self)
         return True
 
     def lysis(self):
         """细胞裂解"""
-        self.env.remove_object(self.x, self.y, self)  # 从环境中删除自己
+        self.env.remove_object((self.x, self.y), self)  # 从环境中删除自己
         # 将蛋白质返回环境
-        ProteinList_idx = self.env.check_type_on_env(self.grid, ProteinList)
-        if ProteinList_idx != None:
-            self.grid[ProteinList_idx].extend(self.protein_list.copy())
-        else:
-            # 没有蛋白质列表时，创建一个新的
-            self.env.write(self.x, self.y, ProteinList(self.protein_list.copy()))
+        self.env.write((self.x, self.y), self.protein_list.copy())
 
         # 将基因返回环境
-        DNAList_idx = self.env.check_type_on_env(self.grid, DNAList)
-        if DNAList_idx != None:
-            self.grid[DNAList_idx].append(self.dna.copy())
-        else:
-            # 如果环境中没有基因列表，创建一个新的
-            self.env.write(self.x, self.y, DNAList([self.dna.copy()]))
+        self.env.write((self.x, self.y), self.dna.copy())
         # 将能量返回环境
         energy_idx = self.env.check_type_on_env(self.grid, env.Energy)
         if energy_idx != None:
             self.grid[energy_idx].value += self.energy.value
         else:
-            self.env.write(self.x, self.y, self.energy.copy())
+            self.env.write((self.x, self.y), self.energy.copy())
 
         self.dead = True    # 细胞死亡
 
@@ -578,10 +561,12 @@ class Cell:
 
 if __name__ == "__main__":
     env1 = env.Environment()
-    env1.write(0,1,env.Energy(200))
+    env1.write((0,1), env.Energy(200))
+
     cell1 = Cell(env1, 0, 0)
     print(cell1.protein_list)
     print(f"细胞{cell1.name}的能量转化率为{cell1.metabolic_rate}")
-    print(env1.read(0, 1))
+    print(env1.read((0, 1)))
+
     print(f"细胞{cell1.name}的颜色RGB为{cell1.color}")
     print(f"细胞{cell1.name}的转化率增幅{cell1.efficiency_increase}")

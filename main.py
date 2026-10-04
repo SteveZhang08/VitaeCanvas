@@ -9,7 +9,7 @@ class SimulationController:
         self.env = env.Environment(-1, -1)
         cell_list = []
         cell_list.append(cells.Cell(self.env, 0, 0, dna = DNA, name="Vita"))
-        resource_list = [env.Energy(100), env.O2(200), env.H2O(200), cells.SugarList([cells.Sugar(6,12,6)])]
+        resource_list = [env.Energy(100), env.O2(200), env.H2O(200), [cells.Sugar(6,12,6)]]
         for resource in resource_list:
             self.env.write((0, 0), resource)
         self.env.write((0, 1), env.Energy(200))
@@ -19,7 +19,7 @@ class SimulationController:
         print(f"共{len(cell_list)}个细胞")
         while True:
             for cell in cell_list:
-                new_cell = metabolism.MetabolismSystem(cell, self.env).re_info()
+                new_cell = metabolism.MetabolismSystem(cell, self.env).re_info()["new"]
                 if new_cell != None:
                     cell_list.append(new_cell)
                 self.env.resources_diffusion()
@@ -29,4 +29,4 @@ class SimulationController:
                 #print(f'当前坐标能量值{round(grid_data[self.env.check_type_on_env(grid_data, env.Energy)].value, 2)}')
             time.sleep(0.1)
 
-SimulationController()
+# SimulationController()

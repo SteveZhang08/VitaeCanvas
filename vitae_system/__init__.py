@@ -2,6 +2,7 @@ from . import cells
 from . import env
 from . import metabolism
 from . import protein
+from . import random_DNA
 
 from time import time
 

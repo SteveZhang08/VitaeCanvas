@@ -87,7 +87,7 @@ class Environment:
         return self.env.get((x, y), [])
 
     def write(self, coordinate, content: any):
-        """写入环境信息（相同类型的信息会被覆盖）"""
+        """写入环境信息"""
         x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]write:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
@@ -155,7 +155,8 @@ class Environment:
             if z != None:
                 layer[z].value += value
             else:
-                self.write(x, y, add_type(value))
+                self.write((x, y), add_type(value))
+
 
         # 统一扩散方向数和计算逻辑
         location_list = self.find_type(diffusion_type)
@@ -226,13 +227,14 @@ class Environment:
         x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
-        grid = self.read(x, y)
+        grid = self.read((x, y))
+
         if grid == None:
             raise Environment_Error(f"[function]remove_type:错误，坐标({x}, {y})上没有元素！\nError, coordinate ({x}, {y}) is empty!")
         idx = self.check_type_on_env(grid, check_type, mode="all")
         if idx != None:
             for i in sorted(idx, reverse=True):
-                self.delete(x, y, i)
+                self.delete((x, y), i)
         else:
             raise Environment_Error(f"[function]remove_type:错误，类型({check_type})未找到！\nError, data type {check_type} not found!")
     
@@ -243,7 +245,9 @@ class Environment:
         x, y = coordinate
         if not self.in_env(x, y):
             raise Environment_Error(f"[function]remove_object:错误，坐标({x}, {y})超出范围！\nError, coordinate ({x}, {y}) out of range!")
-        grid: list = self.read(x, y)
+        grid: list = self.read((x, y))
+        
+
         if grid == None:
             raise Environment_Error(f"[function]remove_object:错误，坐标({x}, {y})上没有元素！\nError, coordinate ({x}, {y}) is empty!")
         if object in grid:
@@ -274,7 +278,8 @@ class Environment:
             wait_move_list.sort()
         for coordinates in wait_move_list:
             x, y = coordinates
-            grid_content = self.read(x, y)
+            grid_content = self.read((x, y))
+
             idx = self.check_type_on_env(grid_content, check_type)
             if idx != None:
                 grid_content[idx].move(x + offset, y)
@@ -300,7 +305,7 @@ class Environment:
             wait_move_list.sort()
         for coordinates in wait_move_list:
             x, y = coordinates
-            grid_content = self.read(x, y)
+            grid_content = self.read((x, y))
             idx = self.check_type_on_env(grid_content, check_type)
             if idx != None:
                 grid_content[idx].move(x, y + offset)
@@ -318,7 +323,7 @@ class Environment:
         move_list = []
         while True:
             # 寻找最后需要被移动的元素
-            grid_content = self.read(x, y)
+            grid_content = self.read((x, y))
             idx = self.check_type_on_env(grid_content, check_type)
             if idx == None:
                 move_list.reverse() # 将列表倒序，以从最边缘的元素开始
@@ -334,7 +339,7 @@ class Environment:
             return
         for coordinates in move_list:
             x, y, idx = coordinates
-            grid_content = self.read(x, y)
+            grid_content = self.read((x, y))
             if mode == 'x':
                 grid_content[idx].move(x + offset, y)
             elif mode == 'y':
@@ -343,7 +348,8 @@ class Environment:
 if __name__ == "__main__":
     env1 = Environment(width=10, height=10)
     energy_1 = Energy(200, diffuse=False)
-    env1.write(0, 0, energy_1)
+    env1.write((0, 0), energy_1)
+
     env1.resources_diffusion()
     import time
     count = 0
@@ -352,7 +358,7 @@ if __name__ == "__main__":
         for x in range(env1.width):
             out = []
             for y in range(env1.height):
-                grid_content = env1.read(x, y)  
+                grid_content = env1.read((x, y))  
                 result = env1.check_type_on_env(grid_content, Energy)  
                 if result is None:
                     out.append([0])

@@ -308,6 +308,7 @@ def draw_protein(protein_structure, title="Protein Structure Visualization", len
     p.down()
     p.pensize(10)
     protein_structure = protein.Protein(protein_structure).structure
+    print(protein_structure)
     # 在绘制之前添加图例
     add_amino_acid_legend(ax, protein_structure, amino_acid_colors)
     for sequence in protein_structure:
@@ -321,5 +322,6 @@ def draw_protein(protein_structure, title="Protein Structure Visualization", len
     return fig
 
 if __name__ == "__main__":
-    draw_protein("GACLICYWSCCMNEEEFGQEGHILKMFPS", show=True)
+    #draw_protein("GACLICYWSCCMNEEEFGQEGHILKMFPS", show=True)
+    draw_protein("MQPIPIVAIVALVVAIIIAIVVWSIVIIEYRKILRQRKIDRLIDRLIERAEDSGNESEGEISALVEMGVEMGHHAPWDVDDL",show=True,title="Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) (HIV-1) \nProtein Vpu (Viral protein U) Structure")
 

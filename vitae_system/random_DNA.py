@@ -7,7 +7,7 @@
 
 import random
 
-def generate_dna(length=30):
+def generate_dna(length=300):
     """生成包含起始和终止密码子的随机DNA序列"""
     if length < 9:  # 确保有足够的长度包含起始和终止密码子
         raise ValueError("序列长度至少为9")

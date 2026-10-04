@@ -21,7 +21,8 @@ class SimulationTestCase(unittest.TestCase):
         for cell_id in range(100):
             new_cell = cells.Cell(self.env, cell_id, cell_id, dna=DNA, name=f"cell_{cell_id}")
             self.cell_list.append(new_cell)
-            self.env.write(cell_id, cell_id, cells.SugarList([cells.Sugar(6,12,6)]))
+            self.env.write((cell_id, cell_id), [cells.Sugar(6,12,6)])
+
 
     def test_environment_initialization(self):
         """测试环境初始化"""
@@ -63,7 +64,8 @@ class SimulationTestCase(unittest.TestCase):
             self.env.resources_diffusion()
             print(f"细胞{cell.name}代谢完成，当前能量值：{round(cell.energy.value,2)}")
             print(f"细胞当前所在位置信息：\n坐标：({cell.x}, {cell.y})")
-            grid_data = self.env.read(cell.x, cell.y)
+            grid_data = self.env.read((cell.x, cell.y))
+
             print(f'当前坐标能量值{round(grid_data.value, 2)}')
             time.sleep(0.01)  # 小幅延时便于观察
 
